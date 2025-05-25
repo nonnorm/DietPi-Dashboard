@@ -263,7 +263,7 @@ fn remove_escape_codes(s: impl Iterator<Item = u8>) -> Vec<u8> {
             Some(Some(c))
         }
     })
-    .filter_map(|c| c)
+    .flatten()
     .collect()
 }
 
