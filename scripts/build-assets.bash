@@ -25,6 +25,8 @@ js_out="$dist_path/main.js"
 css_out="$dist_path/main.css"
 svg_out="$dist_path/icons.svg"
 
+mkdir "$dist_path"
+
 ./scripts/clean-css.bash "${css_assets[@]:1}" > "${css_assets[0]}"
 
 cat "${js_assets[@]}" | gzip -9 > "$js_out"
