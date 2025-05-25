@@ -1,0 +1,5 @@
+.management-table {
+    td:first-child {
+        font-weight: var(--font-weight-medium);
+    }
+}

@@ -1,0 +1,13 @@
+[package]
+name = "proto"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+bitcode.workspace = true
+futures-util = { version = "0.3.31", features = ["sink"] }
+serde.workspace = true
+tokio = { workspace = true, features = ["net", "io-util", "sync"] }
+tokio-util = { version = "0.7.15", features = ["codec"] }

@@ -1,0 +1,82 @@
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(var(--size-14), 1fr));
+    grid-auto-rows: var(--size-10);
+    gap: var(--size-3);
+}
+
+.span-2 {
+    grid-row: span 2;
+}
+
+.span-3 {
+    grid-row: span 3;
+}
+
+.span-4 {
+    grid-row: span 4;
+}
+
+.span-5 {
+    grid-row: span 5;
+}
+
+.span-6 {
+    grid-row: span 6;
+}
+
+.meter-container {
+    height: var(--size-4);
+
+    border: solid var(--border-size-1) light-dark(black, var(--gray-6));
+    border-radius: var(--radius-xs);
+
+    >.bar {
+        height: 100%;
+
+        transform-origin: left;
+        transform: scaleX(var(--scale));
+
+        background: linear-gradient(to right, var(--start), var(--end));
+        background-size: calc(100% / var(--scale));
+    }
+
+    >.bar.-cpu {
+        --start: var(--green-6);
+        --end: var(--green-10);
+    }
+
+    >.bar.-ram {
+        --start: light-dark(var(--red-6), var(--red-8));
+        --end: var(--red-10);
+    }
+
+    >.bar.-swap {
+        --start: light-dark(var(--blue-6), var(--blue-8));
+        --end: var(--blue-10);
+    }
+
+    >.bar.-disk {
+        --start: var(--yellow-6);
+        --end: var(--yellow-10);
+    }
+}
+
+.graph {
+    line {
+        stroke-width: 0.25;
+        stroke: gray;
+    }
+
+    text {
+        font-size: 3pt;
+
+        fill: light-dark(black, white);
+        stroke: none;
+    }
+}
+
+.dummy {
+    --purple: var(--purple-6);
+    --pink: var(--pink-6);
+}

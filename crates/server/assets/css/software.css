@@ -1,0 +1,20 @@
+.software-input {
+    padding: var(--size-2);
+
+    border-radius: var(--radius-md);
+    border: none;
+
+    cursor: pointer;
+
+    &:disabled {
+        opacity: 70%;
+    }
+
+    &[value="Install"] {
+        background-color: var(--green-6);
+    }
+
+    &[value="Uninstall"] {
+        background-color: var(--red-6);
+    }
+}

@@ -1,0 +1,16 @@
+[package]
+name = "backend"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+config = { workspace = true, features = ["backend"] }
+log.workspace = true
+proto.workspace = true
+pty-process = { version = "0.5.1", features = ["async"] }
+simple_logger.workspace = true
+sysinfo = { version = "0.32.0", default-features = false, features = ["system", "component", "disk", "network"] }
+tokio = { workspace = true, features = ["rt", "net", "sync", "macros", "time"] }

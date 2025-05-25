@@ -1,0 +1,27 @@
+# TCP port for webserver
+# - Default: 5252
+http_port = {http_port}
+# TCP port for backend client connections
+# - Default: 5353
+backend_port = {backend_port}
+
+# Maximum log level
+# - Options: "off", "error", "warn", "info", "debug"
+# - Default: "info"
+log_level = {log_level}
+
+# Enable HTTPS mode
+# - Default: false
+enable_tls = {enable_tls}
+# Path to TLS certificate
+cert_path = {cert_path}
+# Path to TLS private key
+key_path = {key_path}
+
+# Enable login
+# - Default: false
+enable_login = {enable_login}
+# SHA512 hash of password
+hash = {hash}
+
+CONFIG_VERSION_DO_NOT_CHANGE = 1
