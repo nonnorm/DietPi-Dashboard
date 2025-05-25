@@ -11,7 +11,6 @@ bitcode.workspace = true
 config = { workspace = true, features = ["frontend"] }
 data-encoding = "2.9.0"
 ephemeropt = "0.3.0"
-fastrand = "2.3.0"
 flexible-hyper-server-tls = { version = "0.6.0", default-features = false, features = ["ring", "rustls_helpers"] }
 futures-util = "0.3.31"
 http-body-util = "0.1.2"
