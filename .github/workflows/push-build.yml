@@ -32,8 +32,9 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           key: ${{ matrix.job.pretty }}-${{ steps.toolchain.outputs.cachekey }}
-      - name: Install cross
-        run: cargo install cross --git https://github.com/cross-rs/cross
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cross
       - name: Build assets
         run: ./scripts/build-assets.bash
       - name: Build DietPi-Dashboard
