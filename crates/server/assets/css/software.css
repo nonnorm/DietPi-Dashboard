@@ -6,15 +6,30 @@
 
     cursor: pointer;
 
+    &[value="install"] {
+        background-color: var(--green-6);
+    }
+
+    &[value="uninstall"] {
+        background-color: var(--red-6);
+    }
+
     &:disabled {
         opacity: 70%;
     }
 
-    &[value="Install"] {
-        background-color: var(--green-6);
+    >.spinner {
+        display: none;
+        animation: spin 1s linear infinite;
     }
 
-    &[value="Uninstall"] {
-        background-color: var(--red-6);
+    &:disabled>.spinner {
+        display: inline;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(1turn)
     }
 }

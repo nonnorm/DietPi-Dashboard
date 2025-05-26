@@ -38,7 +38,7 @@ fn header(req: &ServerRequest) -> Result<Markup, ServerResponse> {
             label {
                 "Backend: "
                 select
-                    onchange="document.cookie = `backend=${this.selectedOptions[0].value}; Path=/; MaxAge=999999999`; window.location.reload()"
+                    onchange="document.cookie = `backend=${this.selectedOptions[0].value}; MaxAge=999999999`; window.location.reload()"
                 {
                     @for backend in backend_list {
                         @let is_current_backend = backend.0 == current_backend.0;

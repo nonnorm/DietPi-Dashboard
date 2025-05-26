@@ -2,13 +2,16 @@ use maud::{Markup, html};
 use proto::{backend::SoftwareInfo, frontend::CommandAction};
 use serde::Deserialize;
 
-use crate::http::{query_array::QueryArray, request::ServerRequest, response::ServerResponse};
+use crate::{
+    http::{query_array::QueryArray, request::ServerRequest, response::ServerResponse},
+    pages::template::Icon,
+};
 
 use super::template::{send_req, template};
 
-fn software_table(list: &[SoftwareInfo], action: &str) -> Markup {
+fn software_table(list: &[SoftwareInfo], pretty_action: &str, action: &str) -> Markup {
     html! {
-        server-swap trigger="submit" target="#output" method="POST" disable={"input[value='" (action) "']"} {
+        server-swap trigger="submit" target="#output" method="POST" disable={"button[value='" (action) "']"} {
             array-form array-name="software" {
                 form {
                     table {
@@ -17,7 +20,7 @@ fn software_table(list: &[SoftwareInfo], action: &str) -> Markup {
                             th { "Description" }
                             th { "Dependencies" }
                             th { "Docs" }
-                            th { (action) }
+                            th { (pretty_action) }
                         }
                         @for item in list {
                             tr {
@@ -38,7 +41,10 @@ fn software_table(list: &[SoftwareInfo], action: &str) -> Markup {
                         }
                     }
                     br;
-                    input .software-input type="submit" name="action" value=(action);
+                    button .software-input name="action" value=(action) {
+                        span .spinner { (Icon::new("svg-spinners-180-ring")) }
+                        (pretty_action)
+                    }
                 }
             }
         }
@@ -53,12 +59,12 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
     let content = html! {
         section {
             h2 { "Installed Software" }
-            (software_table(&data.installed, "Uninstall"))
+            (software_table(&data.installed, "Uninstall", "uninstall"))
         }
         br;
         section {
             h2 { "Not Installed Software" }
-            (software_table(&data.uninstalled, "Install"))
+            (software_table(&data.uninstalled, "Install", "install"))
         }
         br;
         #output {}
@@ -68,6 +74,7 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
 }
 
 #[derive(Deserialize)]
+#[serde(rename_all = "lowercase")]
 enum SoftwareAction {
     Install,
     Uninstall,
