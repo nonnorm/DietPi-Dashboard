@@ -29,8 +29,10 @@ fn header(req: &ServerRequest) -> Result<Markup, ServerResponse> {
 
     Ok(html! {
         header {
-            button onclick="body.classList.toggle('nav-closed')" {
-                (Icon::new("fa6-solid-bars").size(48))
+            expand-button target="body" {
+                button aria-expanded="true" aria-controls="nav" {
+                    (Icon::new("fa6-solid-bars").size(48))
+                }
             }
 
             label {
@@ -60,7 +62,7 @@ fn header(req: &ServerRequest) -> Result<Markup, ServerResponse> {
 
 fn nav() -> Markup {
     html! {
-        nav {
+        nav #nav {
             a href="/system" {
                 (Icon::new("fa6-solid-gauge"))
                 "System"
@@ -115,7 +117,7 @@ pub fn template(req: &ServerRequest, content: Markup) -> Result<ServerResponse, 
 
                     link rel="stylesheet" href="/static/main.css";
                 }
-                body {
+                body data-expanded="true" {
                     h1 { "DietPi Dashboard" }
 
                     (header(req)?)

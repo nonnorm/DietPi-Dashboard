@@ -102,4 +102,17 @@
             })
         }
     });
+
+    customElements.define("expand-button", class extends HTMLElement {
+        connectedCallback() {
+            const button = this.querySelector("button");
+            const target = document.querySelector(this.getAttribute("target"));
+
+            button.addEventListener("click", () => {
+                const expanded = button.getAttribute("aria-expanded") === "true";
+                button.setAttribute("aria-expanded", !expanded);
+                target.dataset.expanded = !expanded;
+            })
+        }
+    });
 })();

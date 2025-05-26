@@ -5,7 +5,6 @@ use log::LevelFilter;
 use serde::Deserialize;
 use toml_migrate::build_migration_chain;
 
-use crate::custom_serde;
 use crate::custom_serde::HexArray;
 use crate::generate_config_file;
 
