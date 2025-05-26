@@ -29,9 +29,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: taiki-e/install-action@v2
-        with:
-          tool: cross
+      - name: Install cross
+        run: cargo install cross --git https://github.com/cross-rs/cross
       - uses: Swatinem/rust-cache@v2
         with:
           key: ${{ matrix.job.pretty }}-${{ steps.toolchain.outputs.cachekey }}
