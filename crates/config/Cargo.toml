@@ -15,3 +15,5 @@ serde.workspace = true
 toml-migrate = { git = "https://github.com/ravenclaw900/toml-migrate" }
 anyhow.workspace = true
 basic-toml = "0.1.10"
+data-encoding = "2.9.0"
+rand = "0.9.1"

@@ -75,7 +75,7 @@ impl BackendClient {
             .context("failed to connect to frontend")?;
 
         Ok(Self {
-            socket: DashboardSocket::new(stream),
+            socket: DashboardSocket::new(stream, context.config.secret.0),
             context,
             rx,
         })

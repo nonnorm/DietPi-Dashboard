@@ -8,6 +8,8 @@ pub mod backend;
 #[cfg(feature = "frontend")]
 pub mod frontend;
 
+mod custom_serde;
+
 pub const APP_VERSION: &str = env!("CARGO_PKG_VERSION");
 pub const PROTOCOL_VERSION: u32 = 1;
 

@@ -25,7 +25,7 @@ js_out="$dist_path/main.js"
 css_out="$dist_path/main.css"
 svg_out="$dist_path/icons.svg"
 
-mkdir "$dist_path"
+mkdir -p "$dist_path"
 
 ./scripts/clean-css.bash "${css_assets[@]:1}" > "${css_assets[0]}"
 

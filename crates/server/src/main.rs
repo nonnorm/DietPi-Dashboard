@@ -29,7 +29,7 @@ async fn main() -> Result<()> {
 
     let backends = Arc::new(Mutex::new(BackendRegistry::new()));
 
-    let backend_server = BackendServer::new(config.backend_port, backends.clone()).await?;
+    let backend_server = BackendServer::new(config.clone(), backends.clone()).await?;
 
     let http_server = HttpServer::new(config, backends.clone()).await?;
 

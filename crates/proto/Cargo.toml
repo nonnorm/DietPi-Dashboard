@@ -8,6 +8,8 @@ license.workspace = true
 [dependencies]
 bitcode.workspace = true
 futures-util = { version = "0.3.31", features = ["sink"] }
+rand = "0.9.1"
+ring = "0.17.14"
 serde.workspace = true
 tokio = { workspace = true, features = ["net", "io-util", "sync"] }
 tokio-util = { version = "0.7.15", features = ["codec"] }

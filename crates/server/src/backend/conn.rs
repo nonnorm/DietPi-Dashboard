@@ -43,9 +43,14 @@ pub struct BackendConnection {
 }
 
 impl BackendConnection {
-    pub fn new(stream: TcpStream, registry: SharedBackendRegistry, addr: IpAddr) -> Self {
+    pub fn new(
+        stream: TcpStream,
+        registry: SharedBackendRegistry,
+        addr: IpAddr,
+        key: [u8; 32],
+    ) -> Self {
         Self {
-            socket: DashboardSocket::new(stream),
+            socket: DashboardSocket::new(stream, key),
             registry,
             addr,
         }

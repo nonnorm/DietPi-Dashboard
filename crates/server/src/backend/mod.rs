@@ -14,24 +14,31 @@ mod conn;
 
 pub use conn::BackendHandle;
 
+use crate::SharedConfig;
+
 pub type BackendRegistry = HashMap<IpAddr, BackendInfo>;
 pub type SharedBackendRegistry = Arc<Mutex<BackendRegistry>>;
 
 pub struct BackendServer {
     listener: TcpListener,
+    config: SharedConfig,
     registry: SharedBackendRegistry,
 }
 
 impl BackendServer {
-    pub async fn new(port: u16, registry: SharedBackendRegistry) -> Result<Self> {
-        info!("Starting backend server on port {port}");
+    pub async fn new(config: SharedConfig, registry: SharedBackendRegistry) -> Result<Self> {
+        info!("Starting backend server on port {}", config.backend_port);
 
-        let addr = SocketAddr::from((Ipv6Addr::UNSPECIFIED, port));
+        let addr = SocketAddr::from((Ipv6Addr::UNSPECIFIED, config.backend_port));
         let listener = TcpListener::bind(addr)
             .await
             .context("failed to bind backend tcp server")?;
 
-        Ok(Self { listener, registry })
+        Ok(Self {
+            listener,
+            config,
+            registry,
+        })
     }
 
     pub async fn run(self) {
@@ -46,7 +53,12 @@ impl BackendServer {
 
             info!("New backend connection from {}", peer_ip);
 
-            let conn = BackendConnection::new(stream, self.registry.clone(), peer_ip);
+            let conn = BackendConnection::new(
+                stream,
+                self.registry.clone(),
+                peer_ip,
+                self.config.secret.0,
+            );
 
             tokio::spawn(conn.handle_connection());
         }

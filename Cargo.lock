@@ -146,7 +146,9 @@ version = "0.7.0"
 dependencies = [
  "anyhow",
  "basic-toml",
+ "data-encoding",
  "log",
+ "rand",
  "serde",
  "toml-migrate",
 ]
@@ -588,6 +590,8 @@ version = "0.7.0"
 dependencies = [
  "bitcode",
  "futures-util",
+ "rand",
+ "ring",
  "serde",
  "tokio",
  "tokio-util",
