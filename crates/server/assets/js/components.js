@@ -106,12 +106,12 @@
     customElements.define("expand-button", class extends HTMLElement {
         connectedCallback() {
             const button = this.querySelector("button");
-            const target = document.querySelector(this.getAttribute("target"));
+            const toggleClass = this.getAttribute("toggle-class");
 
             button.addEventListener("click", () => {
                 const expanded = button.getAttribute("aria-expanded") === "true";
                 button.setAttribute("aria-expanded", !expanded);
-                target.dataset.expanded = !expanded;
+                document.body.classList.toggle(toggleClass)
             })
         }
     });

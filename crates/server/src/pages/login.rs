@@ -21,6 +21,7 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
 
             form method="POST" {
                 input name="pass" type="password" placeholder="Password" {}
+                br;
                 input type="submit" {}
             }
         }

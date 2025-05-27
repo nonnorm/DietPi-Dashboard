@@ -29,7 +29,7 @@ fn header(req: &ServerRequest) -> Result<Markup, ServerResponse> {
 
     Ok(html! {
         header {
-            expand-button target="body" {
+            expand-button toggle-class="nav-closed" {
                 button aria-expanded="true" aria-controls="nav" {
                     (Icon::new("fa6-solid-bars").size(48))
                 }
@@ -46,6 +46,12 @@ fn header(req: &ServerRequest) -> Result<Markup, ServerResponse> {
                             (backend.1) " (" (backend.0) ")"
                         }
                     }
+                }
+            }
+
+            expand-button toggle-class="msgs-open" {
+                button aria-expanded="false" aria-controls="msgs" {
+                    (Icon::new("fa6-solid-envelope"))
                 }
             }
 
@@ -117,10 +123,12 @@ pub fn template(req: &ServerRequest, content: Markup) -> Result<ServerResponse, 
 
                     link rel="stylesheet" href="/static/main.css";
                 }
-                body data-expanded="true" {
+                body {
                     h1 { "DietPi Dashboard" }
 
                     (header(req)?)
+
+                    #messages {}
 
                     (nav())
 

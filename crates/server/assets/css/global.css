@@ -14,10 +14,11 @@ pre {
 
 body {
     display: grid;
-    grid-template-columns: 0 auto;
-    grid-template-rows: var(--size-8) auto var(--size-9);
+    grid-template-columns: var(--size-13) auto;
+    grid-template-rows: var(--size-8) 0 auto var(--size-9);
     grid-template-areas:
         "title head"
+        "nav   msgs"
         "nav   main"
         "nav   foot";
 
@@ -25,11 +26,15 @@ body {
 
     font-family: var(--font-system-ui);
 
-    &[data-expanded="true"] {
-        grid-template-columns: var(--size-13) auto;
+    &.nav-closed {
+        grid-template-columns: 0 auto;
     }
 
-    transition: grid-template-columns 500ms;
+    &.msgs-open {
+        grid-template-rows: var(--size-8) var(--size-10) auto var(--size-9);
+    }
+
+    transition: grid-template-columns 500ms, grid-template-rows 500ms;
 }
 
 h1 {
@@ -55,6 +60,14 @@ header {
     padding: var(--size-2);
 
     background-color: light-dark(var(--dietpi-light), var(--dietpi-teal-light));
+}
+
+#messages {
+    grid-area: msgs;
+
+    overflow: hidden;
+
+    background-color: var(--gray-3);
 }
 
 footer {
