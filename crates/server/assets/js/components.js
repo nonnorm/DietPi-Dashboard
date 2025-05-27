@@ -115,4 +115,27 @@
             })
         }
     });
+
+    customElements.define("update-check", class extends HTMLElement {
+        async connectedCallback() {
+            const currentVersion = this.getAttribute("version");
+
+            const now = Math.round(Date.now() / 1000);
+            let { newVersion, lastChecked } = JSON.parse(localStorage.getItem("update-check") || '{"lastChecked": 0}');
+
+            if (now - lastChecked > 86400) {
+                const resp = await fetch("https://api.github.com/repos/ravenclaw900/DietPi-Dashboard/tags");
+                const json = await resp.json();
+
+                // Remove preceding 'v'
+                newVersion = json[0].name.substring(1);
+
+                localStorage.setItem("update-check", JSON.stringify({ newVersion, lastChecked: now }))
+            }
+
+            if (newVersion.localeCompare(currentVersion, undefined, { numeric: true }) === 1) {
+                this.innerText = `New version available: ${newVersion}`;
+            }
+        }
+    });
 })();

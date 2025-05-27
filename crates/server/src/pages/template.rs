@@ -63,6 +63,13 @@ fn header(req: &ServerRequest) -> Result<Markup, ServerResponse> {
                 }
             }
         }
+        #messages {
+            ul {
+                li {
+                    update-check version=(config::APP_VERSION) {}
+                }
+            }
+        }
     })
 }
 
@@ -127,8 +134,6 @@ pub fn template(req: &ServerRequest, content: Markup) -> Result<ServerResponse, 
                     h1 { "DietPi Dashboard" }
 
                     (header(req)?)
-
-                    #messages {}
 
                     (nav())
 

@@ -67,7 +67,18 @@ header {
 
     overflow: hidden;
 
-    background-color: var(--gray-3);
+    background-color: light-dark(var(--gray-3), var(--gray-10));
+
+    >ul {
+        padding: var(--size-2);
+        line-height: 1.5;
+
+        list-style: none;
+
+        >li {
+            border-bottom: var(--gray-6) solid var(--border-size-2);
+        }
+    }
 }
 
 footer {
