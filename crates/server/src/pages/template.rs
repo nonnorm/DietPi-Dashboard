@@ -63,7 +63,7 @@ fn header(req: &ServerRequest) -> Result<Markup, ServerResponse> {
                 }
             }
         }
-        #messages {
+        #msgs {
             ul {
                 li {
                     update-check version=(config::APP_VERSION) {}

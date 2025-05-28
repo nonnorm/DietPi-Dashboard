@@ -62,7 +62,7 @@ header {
     background-color: light-dark(var(--dietpi-light), var(--dietpi-teal-light));
 }
 
-#messages {
+#msgs {
     grid-area: msgs;
 
     overflow: hidden;

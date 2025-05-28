@@ -1,0 +1,22 @@
+code-editor {
+    display: grid;
+
+    >textarea {
+        grid-area: 1 / 1;
+
+        resize: none;
+
+        overflow-y: hidden;
+
+        background-color: transparent;
+        color: transparent;
+        caret-color: light-dark(black, white);
+        border: none;
+    }
+
+    >pre {
+        grid-area: 1 / 1;
+
+        pointer-events: none;
+    }
+}

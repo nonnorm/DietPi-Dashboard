@@ -138,4 +138,28 @@
             }
         }
     });
+
+    customElements.define("code-editor", class extends HTMLElement {
+        connectedCallback() {
+            const textarea = this.querySelector("textarea");
+            const pre = this.querySelector("pre");
+
+            const highlight = () => {
+                pre.textContent = textarea.value;
+                microlight(pre);
+            }
+
+            const autosize = () => {
+                textarea.style.height = "0px";
+                textarea.style.height = textarea.scrollHeight + "px";
+                pre.style.height = textarea.scrollHeight + "px";
+            }
+
+            textarea.addEventListener("input", highlight);
+            textarea.addEventListener("input", autosize);
+
+            highlight();
+            autosize();
+        }
+    })
 })();
