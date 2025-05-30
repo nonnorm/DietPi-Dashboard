@@ -20,3 +20,50 @@ code-editor {
         pointer-events: none;
     }
 }
+
+#browser-table {
+    grid-area: table;
+
+    tr {
+        user-select: none;
+
+        button {
+            text-align: start;
+
+            width: 100%;
+            height: 100%;
+        }
+
+        &[aria-current="true"] {
+            background-color: var(--dietpi-light);
+        }
+    }
+}
+
+#browser-swap {
+    display: grid;
+    grid-template-columns: 1fr var(--size-12);
+    grid-template-rows: var(--size-7) 1fr;
+    grid-template-areas:
+        "path    --   "
+        "table sidebar";
+    gap: var(--size-4);
+}
+
+#path-display {
+    grid-area: path;
+
+    display: flex;
+    align-items: center;
+    gap: var(--size-1);
+
+    padding: var(--size-2);
+
+    background-color: var(--gray-4);
+
+    button {
+        padding: var(--size-1);
+
+        background-color: transparent;
+    }
+}

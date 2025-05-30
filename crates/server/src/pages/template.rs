@@ -100,6 +100,10 @@ fn nav() -> Markup {
                 (Icon::new("fa6-solid-terminal"))
                 "Terminal"
             }
+            a href="/browser" {
+                (Icon::new("fa6-solid-folder"))
+                "File Browser"
+            }
         }
     }
 }

@@ -24,6 +24,7 @@ pub enum ResponseBackendMessage {
     Software(SoftwareResponse),
     Command(CommandResponse),
     Services(ServiceResponse),
+    Directory(DirectoryResponse),
 }
 
 #[derive(Debug, Clone, Encode, Decode)]
@@ -127,7 +128,7 @@ pub struct CommandResponse {
     pub output: Vec<u8>,
 }
 
-#[derive(Debug, Clone, Encode, Decode)]
+#[derive(Debug, Clone, Encode, Decode, Default)]
 pub struct ServiceResponse {
     pub services: Vec<ServiceInfo>,
 }
@@ -146,4 +147,24 @@ pub enum ServiceStatus {
     Inactive,
     Failed,
     Unknown,
+}
+
+#[derive(Debug, Clone, Encode, Decode, Default)]
+pub struct DirectoryResponse {
+    pub dir_list: Vec<DirectoryItemInfo>,
+}
+
+#[derive(Debug, Clone, Encode, Decode)]
+pub struct DirectoryItemInfo {
+    pub path: String,
+    pub kind: FileKind,
+    pub size: Option<u64>,
+}
+
+#[derive(Debug, Clone, Copy, Encode, Decode)]
+pub enum FileKind {
+    TextFile,
+    BinaryFile,
+    Directory,
+    Special,
 }

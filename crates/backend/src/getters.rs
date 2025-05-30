@@ -1,10 +1,14 @@
+use std::os::unix::fs::MetadataExt;
 use std::{fs, path::PathBuf, process::Command};
 
+use mime_guess::mime;
+use proto::backend::FileKind;
 use proto::{
     backend::{
-        CommandResponse, CpuResponse, DiskInfo, DiskResponse, HostResponse, MemResponse,
-        NetworkResponse, ProcessInfo, ProcessResponse, ProcessStatus, ServiceInfo, ServiceResponse,
-        ServiceStatus, SoftwareInfo, SoftwareResponse, TempResponse, UsageData,
+        CommandResponse, CpuResponse, DirectoryItemInfo, DirectoryResponse, DiskInfo, DiskResponse,
+        HostResponse, MemResponse, NetworkResponse, ProcessInfo, ProcessResponse, ProcessStatus,
+        ServiceInfo, ServiceResponse, ServiceStatus, SoftwareInfo, SoftwareResponse, TempResponse,
+        UsageData,
     },
     frontend::CommandAction,
 };
@@ -337,7 +341,40 @@ fn services_helper() -> Option<ServiceResponse> {
 }
 
 pub fn services(_ctx: BackendContext) -> ServiceResponse {
-    services_helper().unwrap_or_else(|| ServiceResponse {
-        services: Vec::new(),
-    })
+    services_helper().unwrap_or_default()
+}
+
+pub fn list_directory_helper(path: String) -> Option<DirectoryResponse> {
+    let dir = fs::read_dir(path).ok()?;
+
+    let dir_list: Vec<DirectoryItemInfo> = dir
+        .filter_map(Result::ok)
+        .filter_map(|item| {
+            let metadata = fs::metadata(item.path()).ok()?;
+
+            let path = item.path().into_os_string().into_string().ok()?;
+
+            let file_type = metadata.file_type();
+            let kind = if file_type.is_dir() {
+                FileKind::Directory
+            } else if file_type.is_file() {
+                match mime_guess::from_path(&path).first_or_octet_stream().type_() {
+                    mime::TEXT => FileKind::TextFile,
+                    _ => FileKind::BinaryFile,
+                }
+            } else {
+                FileKind::Special
+            };
+
+            let size = metadata.is_file().then_some(metadata.size());
+
+            Some(DirectoryItemInfo { path, kind, size })
+        })
+        .collect();
+
+    Some(DirectoryResponse { dir_list })
+}
+
+pub fn list_directory(_ctx: BackendContext, path: String) -> DirectoryResponse {
+    list_directory_helper(path).unwrap_or_default()
 }

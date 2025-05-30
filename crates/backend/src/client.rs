@@ -148,6 +148,7 @@ impl RequestHandler {
                     Software => getters::software,
                     Command(action) => getters::command,
                     Services => getters::services,
+                    Directory(path) => getters::list_directory,
                 });
 
                 let resp = BackendMessage::Response(id, resp);

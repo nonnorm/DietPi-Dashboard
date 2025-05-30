@@ -9,6 +9,7 @@ license.workspace = true
 anyhow.workspace = true
 config = { workspace = true, features = ["backend"] }
 log.workspace = true
+mime_guess = { version = "2.0.5", default-features = false }
 proto.workspace = true
 pty-process = { version = "0.5.1", features = ["async"] }
 simple_logger.workspace = true

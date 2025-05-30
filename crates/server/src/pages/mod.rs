@@ -1,3 +1,4 @@
+pub mod browser;
 pub mod login;
 pub mod management;
 pub mod process;
