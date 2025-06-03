@@ -43,7 +43,7 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
                 }
             }
 
-            table #browser-table {
+            table #browser-table data="{ selectedRow: null }" {
                 tr {
                     th { "File Name" }
                     th { "File Size" }
@@ -57,16 +57,14 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
                         FileKind::Special => "fa6-solid-cube",
                     };
                     @let pretty_size = item.size.map(|size| pretty_bytes(size, Some(0)).to_string()).unwrap_or_else(|| "--".into());
-
-                        tr {
+                        tr bind="{ ariaCurrent: selectedRow === this }" {
                             td {
                                 server-swap
                                     target="#browser-swap"
                                     action={"/browser?path=" (item.path)}
                                     trigger="dblclick"
                                 {
-                                    button
-                                        onclick="document.querySelectorAll('tr').forEach((el) => el.setAttribute('aria-current', false)); this.closest('tr').setAttribute('aria-current', true);"
+                                    button bind="{ onclick: () => selectedRow = this.closest('tr') }"
                                     {
                                         (Icon::new(icon).size(18)) " " (name)
                                     }

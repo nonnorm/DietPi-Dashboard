@@ -29,16 +29,17 @@ fn header(req: &ServerRequest) -> Result<Markup, ServerResponse> {
 
     Ok(html! {
         header {
-            expand-button toggle-class="nav-closed" {
-                button aria-expanded="true" aria-controls="nav" {
-                    (Icon::new("fa6-solid-bars").size(48))
-                }
+            button aria-controls="nav" bind="{
+                onclick: () => navOpen = !navOpen,
+                ariaExpanded: navOpen
+            }" {
+                (Icon::new("fa6-solid-bars").size(48))
             }
 
             label {
                 "Backend: "
                 select
-                    onchange="document.cookie = `backend=${this.selectedOptions[0].value}; MaxAge=999999999`; window.location.reload()"
+                    onchange="document.cookie = `backend=${this.value}; MaxAge=999999999`; window.location.reload()"
                 {
                     @for backend in backend_list {
                         @let is_current_backend = backend.0 == current_backend.0;
@@ -49,25 +50,39 @@ fn header(req: &ServerRequest) -> Result<Markup, ServerResponse> {
                 }
             }
 
-            expand-button toggle-class="msgs-open" {
-                button aria-expanded="false" aria-controls="msgs" {
-                    (Icon::new("fa6-solid-envelope"))
-                }
+            button aria-controls="msgs" bind="{
+                onclick: () => msgsOpen = !msgsOpen,
+                ariaExpanded: msgsOpen,
+            }" {
+                (Icon::new("fa6-solid-envelope"))
             }
 
-            theme-switcher {
-                meta name="color-scheme" {}
-                button {
-                    (Icon::new("fa6-solid-sun"))
-                    (Icon::new("fa6-solid-moon"))
+            span data="{ isDark: localStorage.getItem('darkMode') === 'true' }" {
+                meta
+                    name="color-scheme"
+                    bind="{ content: isDark ? 'dark' : 'light' }"
+                {}
+                button bind="{
+                    onclick: () => {
+                        isDark = !isDark;
+                        localStorage.setItem('darkMode', isDark);
+                    }
+                }" {
+                    span bind="{ hidden: isDark }" {
+                        (Icon::new("fa6-solid-sun"))
+                    }
+                    span bind="{ hidden: !isDark }" {
+                        (Icon::new("fa6-solid-moon"))
+                    }
                 }
             }
         }
         #msgs {
             ul {
-                li {
-                    update-check version=(config::APP_VERSION) {}
-                }
+                li
+                    data={ "{ updateMessage: getUpdateMessage('"(config::APP_VERSION)"') }" }
+                    bind="{ textContent: updateMessage }"
+                {}
             }
         }
     })
@@ -134,14 +149,20 @@ pub fn template(req: &ServerRequest, content: Markup) -> Result<ServerResponse, 
 
                     link rel="stylesheet" href="/static/main.css";
                 }
-                body {
+                body
+                    data="{ navOpen: true, msgsOpen: false }"
+                    bind="{
+                        className: `${navOpen ? '' : 'nav-closed'} ${msgsOpen ? 'msgs-open' : ''}`
+                    }" 
+                {
                     h1 { "DietPi Dashboard" }
 
                     (header(req)?)
 
                     (nav())
 
-                    main {
+                    main
+                    {
                         (content)
                     }
 

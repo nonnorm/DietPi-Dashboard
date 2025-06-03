@@ -186,3 +186,7 @@ table {
         background-color: light-dark(var(--gray-3), var(--gray-9));
     }
 }
+
+.hidden {
+    display: none;
+}
