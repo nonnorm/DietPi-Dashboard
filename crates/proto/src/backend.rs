@@ -1,4 +1,5 @@
 use bitcode::{Decode, Encode};
+use serde::Deserialize;
 
 #[derive(Debug, Clone, Encode, Decode)]
 pub enum BackendMessage {
@@ -161,7 +162,7 @@ pub struct DirectoryItemInfo {
     pub size: Option<u64>,
 }
 
-#[derive(Debug, Clone, Copy, Encode, Decode)]
+#[derive(Debug, Clone, Copy, Encode, Decode, Deserialize)]
 pub enum FileKind {
     TextFile,
     BinaryFile,

@@ -161,8 +161,7 @@ pub fn template(req: &ServerRequest, content: Markup) -> Result<ServerResponse, 
 
                     (nav())
 
-                    main
-                    {
+                    main {
                         (content)
                     }
 

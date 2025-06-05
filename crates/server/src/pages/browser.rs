@@ -37,9 +37,7 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
                 });
 
                 @for (full_path, path_segment) in paths {
-                    server-swap target="#browser-swap" action={"/browser?path=" (full_path)} {
-                        button { (path_segment) }
-                    }
+                    button fx-action={"/browser?path=" (full_path)} fx-target="#browser-swap" { (path_segment) }
                 }
             }
 
@@ -57,25 +55,40 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
                         FileKind::Special => "fa6-solid-cube",
                     };
                     @let pretty_size = item.size.map(|size| pretty_bytes(size, Some(0)).to_string()).unwrap_or_else(|| "--".into());
-                        tr bind="{ ariaCurrent: selectedRow === this }" {
-                            td {
-                                server-swap
-                                    target="#browser-swap"
-                                    action={"/browser?path=" (item.path)}
-                                    trigger="dblclick"
-                                {
-                                    button bind="{ onclick: () => selectedRow = this.closest('tr') }"
-                                    {
-                                        (Icon::new(icon).size(18)) " " (name)
-                                    }
-                                }
-                            }
-                            td { (pretty_size) }
+                    tr
+                        bind="{
+                            ariaCurrent: selectedRow === this,
+                            onclick: () => selectedRow = this.closest('tr')
+                        }"
+                        fx-action={"/browser?path=" (item.path)}
+                        fx-target="#browser-swap"
+                        fx-trigger="dblclick"
+                    {
+                        td {
+                            (Icon::new(icon).size(18)) " " (name)
                         }
+                        td { (pretty_size) }
+                    }
                 }
             }
         }
     };
+
+    template(&req, content)
+}
+
+#[derive(Deserialize)]
+pub struct BrowserActionsQuery {
+    path: String,
+    kind: FileKind
+}
+
+pub async fn actions_list(req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
+    req.check_login()?;
+
+    let query: BrowserActionsQuery = req.extract_query()?;
+
+    let content = html! {};
 
     template(&req, content)
 }

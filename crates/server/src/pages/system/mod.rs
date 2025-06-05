@@ -42,7 +42,7 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
     let new_query = serde_urlencoded::to_string(&query).unwrap();
 
     let content = html! {
-        server-swap .card-grid action={"/system?" (new_query)} trigger="delay" {
+        .card-grid fx-action={"/system?" (new_query)} fx-trigger="delay" {
             (cpu_meters)
             (cpu_graph)
             @if let Some(temp_graph) = temp_graph {

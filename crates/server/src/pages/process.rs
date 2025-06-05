@@ -40,15 +40,13 @@ fn table_header(name: &str, sort: ColumnSort, query: &ProcessQuery) -> Markup {
 
     html! {
         th {
-            server-swap action={"/process?" (new_query)} target="#process-swap" {
-                button {
-                    (name)
-                    @if query.sort == sort {
-                        @if query.reverse {
-                            (Icon::new("fa6-solid-sort-down"))
-                        } @else {
-                            (Icon::new("fa6-solid-sort-up"))
-                        }
+            button fx-action={"/process?" (new_query)} fx-target="#process-swap" {
+                (name)
+                @if query.sort == sort {
+                    @if query.reverse {
+                        (Icon::new("fa6-solid-sort-down"))
+                    } @else {
+                        (Icon::new("fa6-solid-sort-up"))
                     }
                 }
             }
@@ -76,44 +74,42 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
     let query_str = serde_urlencoded::to_string(&query).unwrap();
 
     let content = html! {
-        server-swap #process-swap action={"/process?" (query_str)} trigger="delay" {
-            section {
-                h2 { "Processes" }
+        section #process-swap fx-action={"/process?" (query_str)} fx-trigger="delay" {
+            h2 { "Processes" }
 
-                table .process-table {
+            table .process-table {
+                tr {
+                    (table_header("PID", ColumnSort::Pid, &query))
+                    (table_header("Name", ColumnSort::Name, &query))
+                    (table_header("Status", ColumnSort::Status, &query))
+                    (table_header("CPU Usage", ColumnSort::Cpu, &query))
+                    (table_header("RAM Usage", ColumnSort::Ram, &query))
+                    th { "Actions" }
+                }
+                @for proc in processes {
+                    @let pretty_mem = pretty_bytes_binary(proc.mem, Some(0));
+
                     tr {
-                        (table_header("PID", ColumnSort::Pid, &query))
-                        (table_header("Name", ColumnSort::Name, &query))
-                        (table_header("Status", ColumnSort::Status, &query))
-                        (table_header("CPU Usage", ColumnSort::Cpu, &query))
-                        (table_header("RAM Usage", ColumnSort::Ram, &query))
-                        th { "Actions" }
-                    }
-                    @for proc in processes {
-                        @let pretty_mem = pretty_bytes_binary(proc.mem, Some(0));
-
-                        tr {
-                            td { (proc.pid) }
-                            td { (proc.name) }
-                            td { (format!("{:?}", proc.status)) }
-                            td { (proc.cpu) "%" }
-                            td { (pretty_mem) }
-                            td {
-                                .actions-cell {
-                                    server-swap action={"/process/signal?signal=kill&pid=" (proc.pid) } target="none" {
-                                        button { (Icon::new("fa6-solid-skull")) }
+                        td { (proc.pid) }
+                        td { (proc.name) }
+                        td { (format!("{:?}", proc.status)) }
+                        td { (proc.cpu) "%" }
+                        td { (pretty_mem) }
+                        td {
+                            .actions-cell {
+                                button fx-action={"/process/signal?signal=kill&pid=" (proc.pid) } fx-target="none" {
+                                    (Icon::new("fa6-solid-skull"))
+                                }
+                                button fx-action={"/process/signal?signal=term&pid=" (proc.pid) } fx-target="none" {
+                                    (Icon::new("fa6-solid-ban"))
+                                }
+                                @if proc.status == ProcessStatus::Paused {
+                                    button fx-action={"/process/signal?signal=resume&pid=" (proc.pid) } fx-target="none" {
+                                        (Icon::new("fa6-solid-play"))
                                     }
-                                    server-swap action={"/process/signal?signal=term&pid=" (proc.pid) } target="none" {
-                                        button { (Icon::new("fa6-solid-ban")) }
-                                    }
-                                    @if proc.status == ProcessStatus::Paused {
-                                        server-swap action={"/process/signal?signal=resume&pid=" (proc.pid) } target="none" {
-                                            button { (Icon::new("fa6-solid-play")) }
-                                        }
-                                    } @else {
-                                        server-swap action={"/process/signal?signal=pause&pid=" (proc.pid) } target="none" {
-                                            button { (Icon::new("fa6-solid-pause")) }
-                                        }
+                                } @else {
+                                    button fx-action={"/process/signal?signal=pause&pid=" (proc.pid) } fx-target="none" {
+                                        (Icon::new("fa6-solid-pause"))
                                     }
                                 }
                             }

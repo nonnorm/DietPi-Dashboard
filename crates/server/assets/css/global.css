@@ -1,10 +1,14 @@
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-button, select, input {
+button,
+select,
+input {
     font: inherit;
 }
 
@@ -69,13 +73,13 @@ header {
 
     background-color: light-dark(var(--gray-3), var(--gray-10));
 
-    >ul {
+    > ul {
         padding: var(--size-2);
         line-height: 1.5;
 
         list-style: none;
 
-        >li {
+        > li {
             border-bottom: var(--gray-6) solid var(--border-size-2);
         }
     }
@@ -158,7 +162,7 @@ section {
     box-shadow: var(--shadow-md);
     border-top: var(--border-size-3) solid light-dark(var(--gray-3), var(--gray-9));
 
-    >h2 {
+    > h2 {
         border-bottom: var(--border-size-2) solid light-dark(var(--gray-3), var(--gray-9));
 
         font-weight: var(--font-weight-medium);
@@ -185,8 +189,4 @@ table {
     tr:nth-child(odd) {
         background-color: light-dark(var(--gray-3), var(--gray-9));
     }
-}
-
-.hidden {
-    display: none;
 }

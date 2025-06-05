@@ -11,41 +11,42 @@ use super::template::{send_req, template};
 
 fn software_table(list: &[SoftwareInfo], pretty_action: &str, action: &str) -> Markup {
     html! {
-        server-swap trigger="submit" target="#output" method="POST" disable={"button[value='" (action) "']"} {
-            form
-                onformdata="e.formData.set('software', e.formData.getAll('software').join(','));"
-            {
-                table {
+        form
+            onformdata="e.formData.set('software', e.formData.getAll('software').join(','));"
+            fx-trigger="submit"
+            fx-method="POST"
+            fx-target="#output"
+        {
+            table {
+                tr {
+                    th { "Name" }
+                    th { "Description" }
+                    th { "Dependencies" }
+                    th { "Docs" }
+                    th { (pretty_action) }
+                }
+                @for item in list {
                     tr {
-                        th { "Name" }
-                        th { "Description" }
-                        th { "Dependencies" }
-                        th { "Docs" }
-                        th { (pretty_action) }
-                    }
-                    @for item in list {
-                        tr {
-                            td { (item.name) }
-                            td { (item.desc) }
-                            td { (item.deps) }
-                            td {
-                                @if item.docs.starts_with("http") {
-                                    a href=(item.docs) { (item.docs) }
-                                } @else {
-                                    (item.docs)
-                                }
+                        td { (item.name) }
+                        td { (item.desc) }
+                        td { (item.deps) }
+                        td {
+                            @if item.docs.starts_with("http") {
+                                a href=(item.docs) { (item.docs) }
+                            } @else {
+                                (item.docs)
                             }
-                            td {
-                                input type="checkbox" name="software" value=(item.id);
-                            }
+                        }
+                        td {
+                            input type="checkbox" name="software" value=(item.id);
                         }
                     }
                 }
-                br;
-                button .software-input name="action" value=(action) {
-                    span .spinner { (Icon::new("svg-spinners-180-ring")) }
-                    (pretty_action)
-                }
+            }
+            br;
+            button .software-input name="action" value=(action) {
+                span .spinner { (Icon::new("svg-spinners-180-ring")) }
+                (pretty_action)
             }
         }
     }
