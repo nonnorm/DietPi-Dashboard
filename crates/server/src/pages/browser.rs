@@ -80,7 +80,7 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
 #[derive(Deserialize)]
 pub struct BrowserActionsQuery {
     path: String,
-    kind: FileKind
+    kind: FileKind,
 }
 
 pub async fn actions_list(req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
