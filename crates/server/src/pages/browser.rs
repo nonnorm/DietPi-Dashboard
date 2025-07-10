@@ -30,7 +30,6 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
     let content = html! {
         #browser-swap {
             #path-display {
-                // First one will always be empty
                 @let paths = query.path.split_inclusive('/').scan(String::new(), |acc, segment| {
                     acc.push_str(segment);
                     Some((acc.clone(), segment))
@@ -58,37 +57,43 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
                     tr
                         bind="{
                             ariaCurrent: selectedRow === this,
-                            onclick: () => selectedRow = this.closest('tr')
+                            onclick: () => selectedRow = this
                         }"
-                        fx-action={"/browser?path=" (item.path)}
-                        fx-target="#browser-swap"
-                        fx-trigger="dblclick"
                     {
                         td {
-                            (Icon::new(icon).size(18)) " " (name)
+                            button
+                                fx-action={"/browser?path=" (item.path)}
+                                fx-target="#browser-swap"
+                                fx-trigger="dblclick"
+                            {
+                                span
+                                    fx-action={"/browser/actions?kind=" (serde_urlencoded::to_string(item.kind).unwrap()) "&path=" (item.path)}
+                                {
+                                    (Icon::new(icon).size(18)) " " (name)
+                                }
+                            }
                         }
                         td { (pretty_size) }
                     }
                 }
             }
+            #actions-list {
+                button onclick="this.nextSibling.showModal()" {
+                    (Icon::new("fa6-solid-folder-plus"))
+                }
+                dialog {
+                    form fx-action="/browser/new-folder" fx-trigger="submit" {
+                        label {
+                            "Enter a file name: "
+                            input name="name" {}
+                        }
+
+                        button { "Submit" };
+                    }
+                }
+            }
         }
     };
-
-    template(&req, content)
-}
-
-#[derive(Deserialize)]
-pub struct BrowserActionsQuery {
-    path: String,
-    kind: FileKind,
-}
-
-pub async fn actions_list(req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
-    req.check_login()?;
-
-    let query: BrowserActionsQuery = req.extract_query()?;
-
-    let content = html! {};
 
     template(&req, content)
 }

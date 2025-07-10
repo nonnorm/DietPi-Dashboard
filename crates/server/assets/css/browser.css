@@ -21,6 +21,16 @@ code-editor {
     }
 }
 
+#browser-swap {
+    display: grid;
+    grid-template-columns: 1fr var(--size-9);
+    grid-template-rows: var(--size-7) 1fr;
+    grid-template-areas:
+        "path    --   "
+        "table actions";
+    gap: var(--size-4);
+}
+
 #browser-table {
     grid-area: table;
 
@@ -40,16 +50,6 @@ code-editor {
     }
 }
 
-#browser-swap {
-    display: grid;
-    grid-template-columns: 1fr var(--size-12);
-    grid-template-rows: var(--size-7) 1fr;
-    grid-template-areas:
-        "path    --   "
-        "table sidebar";
-    gap: var(--size-4);
-}
-
 #path-display {
     grid-area: path;
 
@@ -66,4 +66,16 @@ code-editor {
 
         background-color: transparent;
     }
+}
+
+#actions-list {
+    grid-area: actions;
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-2);
+
+    padding: var(--size-1);
+
+    background-color: light-dark(var(--gray-4), var(--gray-8));
 }

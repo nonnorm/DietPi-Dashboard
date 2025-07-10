@@ -40,7 +40,7 @@ pub async fn router(req: ServerRequest) -> Result<BuiltResponse, std::convert::I
         (GET, ["system"]) => system::page,
 
         (GET, ["process"]) => process::page,
-        (GET, ["process", "signal"]) => process::signal,
+        (POST, ["process", "signal"]) => process::signal,
 
         (GET, ["software"]) => software::page,
         (POST, ["software"]) => software::form,

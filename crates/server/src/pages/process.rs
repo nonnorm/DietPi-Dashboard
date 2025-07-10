@@ -38,9 +38,11 @@ fn table_header(name: &str, sort: ColumnSort, query: &ProcessQuery) -> Markup {
     let new_query = ProcessQuery { sort, reverse };
     let new_query = serde_urlencoded::to_string(&new_query).unwrap();
 
+    let url = format!("'/process?{new_query}'");
+
     html! {
         th {
-            button fx-action={"/process?" (new_query)} fx-target="#process-swap" {
+            button nm-bind={ "onclick: () => get("(url)")" } {
                 (name)
                 @if query.sort == sort {
                     @if query.reverse {
@@ -72,9 +74,10 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
     }
 
     let query_str = serde_urlencoded::to_string(&query).unwrap();
+    let url = format!("'/process?{query_str}'",);
 
     let content = html! {
-        section #process-swap fx-action={"/process?" (query_str)} fx-trigger="delay" {
+        section #process-swap nm-bind={ "_: () => debounce(() => get("(url)"), 2000)" } {
             h2 { "Processes" }
 
             table .process-table {
@@ -97,18 +100,18 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
                         td { (pretty_mem) }
                         td {
                             .actions-cell {
-                                button fx-action={"/process/signal?signal=kill&pid=" (proc.pid) } fx-target="none" {
+                                button nm-bind={ "onclick: () => post('/process/signal?signal=kill&pid="(proc.pid)"')" } {
                                     (Icon::new("fa6-solid-skull"))
                                 }
-                                button fx-action={"/process/signal?signal=term&pid=" (proc.pid) } fx-target="none" {
+                                button nm-bind={ "onclick: () => post('/process/signal?signal=term&pid="(proc.pid)"')" } {
                                     (Icon::new("fa6-solid-ban"))
                                 }
                                 @if proc.status == ProcessStatus::Paused {
-                                    button fx-action={"/process/signal?signal=resume&pid=" (proc.pid) } fx-target="none" {
+                                    button nm-bind={ "onclick: () => post('/process/signal?signal=resume&pid="(proc.pid)"')" } {
                                         (Icon::new("fa6-solid-play"))
                                     }
                                 } @else {
-                                    button fx-action={"/process/signal?signal=pause&pid=" (proc.pid) } fx-target="none" {
+                                    button nm-bind={ "onclick: () => post('/process/signal?signal=pause&pid="(proc.pid)"')" } {
                                         (Icon::new("fa6-solid-pause"))
                                     }
                                 }

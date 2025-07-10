@@ -40,9 +40,10 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
     let net_graph = fragments::net_graph(&net_data, &mut query.sent_points, &mut query.recv_points);
 
     let new_query = serde_urlencoded::to_string(&query).unwrap();
+    let url = format!("'/system?{new_query}'",);
 
     let content = html! {
-        .card-grid fx-action={"/system?" (new_query)} fx-trigger="delay" {
+        div #system-swap .card-grid nm-bind={ "_: () => debounce(() => get("(url)"), 2000)" } {
             (cpu_meters)
             (cpu_graph)
             @if let Some(temp_graph) = temp_graph {

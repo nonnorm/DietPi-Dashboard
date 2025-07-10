@@ -11,12 +11,7 @@ use super::template::{send_req, template};
 
 fn software_table(list: &[SoftwareInfo], pretty_action: &str, action: &str) -> Markup {
     html! {
-        form
-            onformdata="e.formData.set('software', e.formData.getAll('software').join(','));"
-            fx-trigger="submit"
-            fx-method="POST"
-            fx-target="#output"
-        {
+        form nm-data="software: []" {
             table {
                 tr {
                     th { "Name" }
@@ -38,13 +33,15 @@ fn software_table(list: &[SoftwareInfo], pretty_action: &str, action: &str) -> M
                             }
                         }
                         td {
-                            input type="checkbox" name="software" value=(item.id);
+                            input type="checkbox" nm-bind={ "onchange: () => software["(item.id)"] = this.checked"};
                         }
                     }
                 }
             }
             br;
-            button .software-input name="action" value=(action) {
+            button .software-input value=(action) nm-bind={
+                "onclick: () => post('/software', { software: software.join(','), action: this.value })"
+            } {
                 span .spinner { (Icon::new("svg-spinners-180-ring")) }
                 (pretty_action)
             }

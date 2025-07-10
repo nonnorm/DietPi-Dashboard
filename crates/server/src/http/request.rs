@@ -172,7 +172,7 @@ impl ServerRequest {
     }
 
     pub fn is_fixi(&self) -> bool {
-        self.headers.contains_key("fx-request")
+        self.headers.contains_key("nm-request")
     }
 
     pub fn extract_websocket<F, Fut>(self, handler_fn: F) -> Result<ServerResponse, ServerResponse>

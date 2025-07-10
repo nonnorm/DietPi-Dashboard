@@ -16,6 +16,17 @@ pre {
     white-space: pre-wrap;
 }
 
+dialog {
+    margin: auto;
+    padding: var(--size-2);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-2);
+}
+
 body {
     display: grid;
     grid-template-columns: var(--size-13) auto;

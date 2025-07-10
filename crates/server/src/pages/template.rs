@@ -29,10 +29,10 @@ fn header(req: &ServerRequest) -> Result<Markup, ServerResponse> {
 
     Ok(html! {
         header {
-            button aria-controls="nav" bind="{
-                onclick: () => navOpen = !navOpen,
-                ariaExpanded: navOpen
-            }" {
+            button
+                aria-controls="nav"
+                nm-bind="onclick: () => navOpen = !navOpen, ariaExpanded: () => navOpen"
+            {
                 (Icon::new("fa6-solid-bars").size(48))
             }
 
@@ -50,28 +50,28 @@ fn header(req: &ServerRequest) -> Result<Markup, ServerResponse> {
                 }
             }
 
-            button aria-controls="msgs" bind="{
-                onclick: () => msgsOpen = !msgsOpen,
-                ariaExpanded: msgsOpen,
-            }" {
+            button
+                aria-controls="msgs"
+                nm-bind="onclick: () => msgsOpen = !msgsOpen, ariaExpanded: () => msgsOpen"
+            {
                 (Icon::new("fa6-solid-envelope"))
             }
 
-            span data="{ isDark: localStorage.getItem('darkMode') === 'true' }" {
+            span nm-data="isDark: localStorage.getItem('darkMode') === 'true'" {
                 meta
                     name="color-scheme"
-                    bind="{ content: isDark ? 'dark' : 'light' }"
+                    nm-bind="content: () => isDark ? 'dark' : 'light'"
                 {}
-                button bind="{
+                button nm-bind="
                     onclick: () => {
                         isDark = !isDark;
                         localStorage.setItem('darkMode', isDark);
                     }
-                }" {
-                    span bind="{ hidden: isDark }" {
+                " {
+                    span nm-bind="hidden: () => isDark" {
                         (Icon::new("fa6-solid-sun"))
                     }
-                    span bind="{ hidden: !isDark }" {
+                    span nm-bind="hidden: () => !isDark" {
                         (Icon::new("fa6-solid-moon"))
                     }
                 }
@@ -80,8 +80,7 @@ fn header(req: &ServerRequest) -> Result<Markup, ServerResponse> {
         #msgs {
             ul {
                 li
-                    data={ "{ updateMessage: getUpdateMessage('"(config::APP_VERSION)"') }" }
-                    bind="{ textContent: updateMessage }"
+                    nm-bind={ "textContent: () => getUpdateMessage('"(config::APP_VERSION)"')" }
                 {}
             }
         }
@@ -150,10 +149,8 @@ pub fn template(req: &ServerRequest, content: Markup) -> Result<ServerResponse, 
                     link rel="stylesheet" href="/static/main.css";
                 }
                 body
-                    data="{ navOpen: true, msgsOpen: false }"
-                    bind="{
-                        className: `${navOpen ? '' : 'nav-closed'} ${msgsOpen ? 'msgs-open' : ''}`
-                    }" 
+                    nm-data="navOpen: true, msgsOpen: false"
+                    nm-bind="className: () => `${navOpen ? '' : 'nav-closed'} ${msgsOpen ? 'msgs-open' : ''}`"
                 {
                     h1 { "DietPi Dashboard" }
 
@@ -161,7 +158,9 @@ pub fn template(req: &ServerRequest, content: Markup) -> Result<ServerResponse, 
 
                     (nav())
 
-                    main {
+                    main nm-data {
+                        p nm-bind="textContent: () => nmError" {}
+
                         (content)
                     }
 
