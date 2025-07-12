@@ -11,7 +11,7 @@ use super::template::{send_req, template};
 
 fn software_table(list: &[SoftwareInfo], pretty_action: &str, action: &str) -> Markup {
     html! {
-        form nm-data="software: []" {
+        div nm-data="software: new Map()" {
             table {
                 tr {
                     th { "Name" }
@@ -33,17 +33,27 @@ fn software_table(list: &[SoftwareInfo], pretty_action: &str, action: &str) -> M
                             }
                         }
                         td {
-                            input type="checkbox" nm-bind={ "onchange: () => software["(item.id)"] = this.checked"};
+                            input type="checkbox" nm-bind={
+                                "onchange: () => {
+                                    this.checked ? software.set("(item.id)", '"(item.name)"') : software.delete("(item.id)");
+                                    software = software;
+                                }"
+                            };
                         }
                     }
                 }
             }
             br;
-            button .software-input value=(action) nm-bind={
-                "onclick: () => post('/software', { software: software.join(','), action: this.value })"
-            } {
+            button .software-input
+                value=(action)
+                nm-bind="
+                    onclick: () => post('/software', { software: Array.from(software.keys()).join(','), action: this.value }),
+                    disabled: () => nmFetching
+                "
+             {
                 span .spinner { (Icon::new("svg-spinners-180-ring")) }
-                (pretty_action)
+                (pretty_action) " "
+                span nm-bind="textContent: () => Array.from(software.values()).join(', ')" {}
             }
         }
     }
@@ -109,7 +119,7 @@ pub async fn form(mut req: ServerRequest) -> Result<ServerResponse, ServerRespon
     let output = String::from_utf8_lossy(&resp.output);
 
     let content = html! {
-        section #output {
+        section #output nm-bind="_: this.scrollIntoView" {
             h2 { "Install Summary" }
             pre {
                 (output)

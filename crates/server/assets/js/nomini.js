@@ -2,6 +2,11 @@
 // Inspired by aidenybai/dababy
 (() => {
     const helpers = {
+        nmFetching: false,
+        nmError: null,
+        nmInternal: {
+            nmTimer: null
+        },
         get(url, data) {
             this.nmFetching = true;
 
@@ -53,13 +58,9 @@
     };
 
     const evalExpression = (expression, data, thisArg) => {
-        const boundHelpers = Object.values(helpers).map(fn => fn.bind(data));
-        const helperKeys = Object.keys(helpers);
-
         return new Function(
-            "nmData", ...helperKeys,
-            `with(nmData) { return {${expression}} }`,
-        ).call(thisArg, data, ...boundHelpers);
+            "nmData", `with(nmData) { return {${expression}} }`,
+        ).call(thisArg, data);
     };
 
     const queryAttr = (el, selector) => {
@@ -76,11 +77,7 @@
                     {},
                     dataEl,
                 ),
-                nmFetching: false,
-                nmError: null,
-                nmInternal: {
-                    nmTimer: null
-                }
+                ...helpers
             };
 
             const trackedDeps = Object.fromEntries(Object.keys(rawData).map(k => [k, new Set()]));
@@ -101,6 +98,12 @@
 
                     return true;
                 },
+            });
+
+            Object.entries(rawData).forEach(([key, val]) => {
+                if (typeof key === "function") {
+                    rawData[key] = val.bind(proxyData);
+                }
             });
 
             dataEl.nmProxy = proxyData;

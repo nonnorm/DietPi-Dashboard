@@ -24,7 +24,7 @@
     }
 
     &:disabled>.spinner {
-        display: inline;
+        display: inline-block;
     }
 }
 

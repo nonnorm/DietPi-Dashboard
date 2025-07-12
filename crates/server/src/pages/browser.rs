@@ -36,11 +36,11 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
                 });
 
                 @for (full_path, path_segment) in paths {
-                    button fx-action={"/browser?path=" (full_path)} fx-target="#browser-swap" { (path_segment) }
+                    button nm-bind={"onclick: () => get('/browser?path="(full_path)"')"} { (path_segment) }
                 }
             }
 
-            table #browser-table data="{ selectedRow: null }" {
+            table #browser-table nm-data="selectedRow: null" {
                 tr {
                     th { "File Name" }
                     th { "File Size" }
@@ -54,43 +54,24 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
                         FileKind::Special => "fa6-solid-cube",
                     };
                     @let pretty_size = item.size.map(|size| pretty_bytes(size, Some(0)).to_string()).unwrap_or_else(|| "--".into());
-                    tr
-                        bind="{
-                            ariaCurrent: selectedRow === this,
-                            onclick: () => selectedRow = this
-                        }"
+                    tr nm-bind={"
+                        ariaCurrent: () => selectedRow === this,
+                        onclick: () => {
+                            selectedRow = this;
+                        },
+                        ondblclick: () => {
+                            get('/browser?path="(item.path)"');
+                        }
+                    "}
                     {
                         td {
-                            button
-                                fx-action={"/browser?path=" (item.path)}
-                                fx-target="#browser-swap"
-                                fx-trigger="dblclick"
-                            {
-                                span
-                                    fx-action={"/browser/actions?kind=" (serde_urlencoded::to_string(item.kind).unwrap()) "&path=" (item.path)}
-                                {
-                                    (Icon::new(icon).size(18)) " " (name)
-                                }
-                            }
+                            (Icon::new(icon).size(18)) " " (name)
                         }
                         td { (pretty_size) }
                     }
                 }
             }
             #actions-list {
-                button onclick="this.nextSibling.showModal()" {
-                    (Icon::new("fa6-solid-folder-plus"))
-                }
-                dialog {
-                    form fx-action="/browser/new-folder" fx-trigger="submit" {
-                        label {
-                            "Enter a file name: "
-                            input name="name" {}
-                        }
-
-                        button { "Submit" };
-                    }
-                }
             }
         }
     };
