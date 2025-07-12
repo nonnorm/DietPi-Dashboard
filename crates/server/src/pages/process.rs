@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::http::{request::ServerRequest, response::ServerResponse};
 
-use super::template::{Icon, send_req, template};
+use super::template::{Icon, send_act, send_req, template};
 
 #[derive(Default, Deserialize, Serialize)]
 #[serde(default)]
@@ -131,8 +131,7 @@ pub async fn signal(req: ServerRequest) -> Result<ServerResponse, ServerResponse
 
     let signal: SignalAction = req.extract_query()?;
 
-    req.send_backend_action(ActionFrontendMessage::Signal(signal))
-        .await?;
+    send_act!(req, Signal(signal))?;
 
     Ok(ServerResponse::new())
 }

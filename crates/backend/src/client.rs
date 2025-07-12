@@ -163,6 +163,8 @@ impl RequestHandler {
                         .await
                         .unwrap()
                 }
+                ActionFrontendMessage::NewFile(path) => actions::new_file(path).await,
+                ActionFrontendMessage::NewFolder(path) => actions::new_folder(path).await,
             },
         }
     }

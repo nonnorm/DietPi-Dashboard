@@ -53,6 +53,9 @@ pub async fn router(req: ServerRequest) -> Result<BuiltResponse, std::convert::I
         (GET, ["terminal", "ws"]) => terminal::socket,
 
         (GET, ["browser"]) => browser::page,
+        (GET, ["browser", "actions"]) => browser::actions,
+        (POST, ["browser", "actions", "new-file"]) => browser::new_file,
+        (POST, ["browser", "actions", "new-folder"]) => browser::new_folder,
 
         _ => || { ServerResponse::new().status(StatusCode::NOT_FOUND).body("page not found") },
     });

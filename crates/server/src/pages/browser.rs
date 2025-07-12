@@ -1,11 +1,14 @@
-use maud::html;
+use maud::{Markup, html};
 use pretty_bytes_typed::pretty_bytes;
 use proto::backend::FileKind;
 use serde::Deserialize;
 
 use crate::{
-    http::{request::ServerRequest, response::ServerResponse},
-    pages::template::Icon,
+    http::{
+        request::ServerRequest,
+        response::{RedirectType, ServerResponse},
+    },
+    pages::template::{Icon, send_act},
 };
 
 use super::template::{send_req, template};
@@ -28,7 +31,7 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
     let data = send_req!(req, Directory(query.path.clone()))?;
 
     let content = html! {
-        #browser-swap {
+        #browser-swap nm-data="selectedRow: null, viewHidden: false" {
             #path-display {
                 @let paths = query.path.split_inclusive('/').scan(String::new(), |acc, segment| {
                     acc.push_str(segment);
@@ -36,11 +39,11 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
                 });
 
                 @for (full_path, path_segment) in paths {
-                    button nm-bind={"onclick: () => get('/browser?path="(full_path)"')"} { (path_segment) }
+                    button nm-bind={"onclick: () => get('/browser', {path: '"(full_path)"'})"} { (path_segment) }
                 }
             }
 
-            table #browser-table nm-data="selectedRow: null" {
+            table #browser-table {
                 tr {
                     th { "File Name" }
                     th { "File Size" }
@@ -54,16 +57,21 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
                         FileKind::Special => "fa6-solid-cube",
                     };
                     @let pretty_size = item.size.map(|size| pretty_bytes(size, Some(0)).to_string()).unwrap_or_else(|| "--".into());
-                    tr nm-bind={"
+                    tr data-hidden[name.starts_with('.')] nm-bind={"
                         ariaCurrent: () => selectedRow === this,
+                        hidden: () => this.dataset.hidden !== undefined && !viewHidden,
                         onclick: () => {
                             selectedRow = this;
+                            get('/browser/actions', {
+                                current_path: '"(query.path)"',
+                                path: '"(item.path)"',
+                                kind: '"(serde_plain::to_string(&item.kind).unwrap())"'
+                            })
                         },
                         ondblclick: () => {
-                            get('/browser?path="(item.path)"');
+                            get('/browser', {path: '"(item.path)"'});
                         }
-                    "}
-                    {
+                    "} {
                         td {
                             (Icon::new(icon).size(18)) " " (name)
                         }
@@ -72,9 +80,96 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
                 }
             }
             #actions-list {
+                (default_actions(&query.path))
             }
         }
     };
 
     template(&req, content)
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BrowserActionsQuery {
+    current_path: String,
+    path: String,
+    kind: FileKind,
+}
+
+pub async fn actions(req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
+    req.check_login()?;
+
+    let query: BrowserActionsQuery = req.extract_query()?;
+
+    let content = html! {
+        div #actions-list {
+            (default_actions(&query.current_path))
+        }
+    };
+
+    template(&req, content)
+}
+
+fn default_actions(current_path: &str) -> Markup {
+    html! {
+        button title="Show Hidden Files" nm-bind="
+            onclick: () => viewHidden = true,
+            hidden: () => viewHidden
+        " { (Icon::new("fa6-solid-eye-slash")) }
+        button title="Hide Hidden Files" nm-bind="
+            onclick: () => viewHidden = false,
+            hidden: () => !viewHidden
+        " { (Icon::new("fa6-solid-eye")) }
+        button title="Refresh" nm-bind={ "onclick: () => get('/browser', {path: '"(current_path)"'})" } {
+            (Icon::new("fa6-solid-rotate"))
+        }
+        button title="New File" nm-bind={"
+            onclick: () => { 
+                let name = prompt('Enter a file name:');
+                if (name) post('/browser/actions/new-file', {parent: '"(current_path)"', name});
+            }
+        "} { (Icon::new("fa6-solid-file-medical")) }
+        button title="New Folder" nm-bind={"
+            onclick: () => { 
+                let name = prompt('Enter a folder name:');
+                if (name) post('/browser/actions/new-folder', {parent: '"(current_path)"', name});
+            }
+        "} { (Icon::new("fa6-solid-folder-plus")) }
+    }
+}
+
+#[derive(Deserialize)]
+pub struct NewQuery {
+    parent: String,
+    name: String,
+}
+
+pub async fn new_file(mut req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
+    req.check_login()?;
+
+    let query: NewQuery = req.extract_form().await?;
+
+    let path = format!("{}{}", query.parent, query.name);
+
+    send_act!(req, NewFile(path))?;
+
+    Ok(ServerResponse::new().redirect(
+        RedirectType::SeeOther,
+        &format!("/browser?path={}", query.parent),
+    ))
+}
+
+pub async fn new_folder(mut req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
+    req.check_login()?;
+
+    let query: NewQuery = req.extract_form().await?;
+
+    let path = format!("{}{}", query.parent, query.name);
+
+    send_act!(req, NewFolder(path))?;
+
+    Ok(ServerResponse::new().redirect(
+        RedirectType::SeeOther,
+        &format!("/browser?path={}", query.parent),
+    ))
 }

@@ -21,6 +21,16 @@ macro_rules! send_req {
 
 pub(crate) use send_req;
 
+macro_rules! send_act {
+    ($req:expr, $variant:ident $(($data:expr))?) => {{
+        use proto::frontend::ActionFrontendMessage;
+
+        $req.send_backend_action(ActionFrontendMessage::$variant $(($data))?).await
+    }};
+}
+
+pub(crate) use send_act;
+
 fn header(req: &ServerRequest) -> Result<Markup, ServerResponse> {
     let BackendData {
         backend_list,

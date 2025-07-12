@@ -26,6 +26,8 @@ pub enum RequestFrontendMessage {
 pub enum ActionFrontendMessage {
     Terminal(Vec<u8>),
     Signal(SignalAction),
+    NewFile(String),
+    NewFolder(String),
 }
 
 #[derive(Debug, Encode, Decode, Deserialize)]

@@ -58,9 +58,14 @@
     };
 
     const evalExpression = (expression, data, thisArg) => {
-        return new Function(
-            "nmData", `with(nmData) { return {${expression}} }`,
-        ).call(thisArg, data);
+        try {
+            return new Function(
+                "nmData", `with(nmData) { return {${expression}} }`,
+            ).call(thisArg, data);
+        } catch (err) {
+            console.error(err, expression);
+            return {};
+        }
     };
 
     const queryAttr = (el, selector) => {

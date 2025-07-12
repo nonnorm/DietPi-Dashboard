@@ -24,6 +24,7 @@ proto.workspace = true
 rand = "0.9.1"
 ring = "0.17.14"
 serde.workspace = true
+serde_plain = "1.0.2"
 serde_urlencoded = "0.7.1"
 simple_logger.workspace = true
 slab = "0.4.9"

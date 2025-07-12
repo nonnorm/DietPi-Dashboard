@@ -355,6 +355,7 @@ pub fn list_directory_helper(path: String) -> Option<DirectoryResponse> {
             let path = item.path().into_os_string().into_string().ok()?;
 
             let file_type = metadata.file_type();
+
             let kind = if file_type.is_dir() {
                 FileKind::Directory
             } else if file_type.is_file() {

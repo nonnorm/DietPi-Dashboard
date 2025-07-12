@@ -1,5 +1,6 @@
 use proto::frontend::{Signal as FrontendSignal, SignalAction};
 use sysinfo::{Pid, Signal};
+use tokio::fs;
 
 use crate::client::BackendContext;
 
@@ -18,4 +19,12 @@ pub fn process_signal(mut ctx: BackendContext, action: SignalAction) {
     };
 
     proc.kill_with(signal);
+}
+
+pub async fn new_file(path: String) {
+    let _ = fs::write(path, []).await;
+}
+
+pub async fn new_folder(path: String) {
+    let _ = fs::create_dir(path).await;
 }
