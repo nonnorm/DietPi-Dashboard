@@ -162,7 +162,7 @@ pub struct DirectoryItemInfo {
     pub size: Option<u64>,
 }
 
-#[derive(Debug, Clone, Copy, Encode, Decode, Deserialize, Serialize)]
+#[derive(Debug, Clone, Copy, Encode, Decode, Deserialize, Serialize, PartialEq, Eq)]
 pub enum FileKind {
     TextFile,
     BinaryFile,

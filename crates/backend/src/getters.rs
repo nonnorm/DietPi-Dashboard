@@ -379,3 +379,7 @@ pub fn list_directory_helper(path: String) -> Option<DirectoryResponse> {
 pub fn list_directory(_ctx: BackendContext, path: String) -> DirectoryResponse {
     list_directory_helper(path).unwrap_or_default()
 }
+
+pub fn read_file(_ctx: BackendContext, path: String) -> Vec<u8> {
+    fs::read(path).unwrap_or_default()
+}

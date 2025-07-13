@@ -33,6 +33,7 @@ code-editor {
 
 #browser-table {
     grid-area: table;
+    align-self: start;
 
     tr {
         user-select: none;

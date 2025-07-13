@@ -1,4 +1,6 @@
-use proto::frontend::{Signal as FrontendSignal, SignalAction};
+use std::path::Path;
+
+use proto::frontend::{RenameAction, Signal as FrontendSignal, SignalAction};
 use sysinfo::{Pid, Signal};
 use tokio::fs;
 
@@ -22,9 +24,24 @@ pub fn process_signal(mut ctx: BackendContext, action: SignalAction) {
 }
 
 pub async fn new_file(path: String) {
-    let _ = fs::write(path, []).await;
+    let path = Path::new(&path);
+    if !path.exists() {
+        let _ = fs::write(path, []).await;
+    }
 }
 
 pub async fn new_folder(path: String) {
     let _ = fs::create_dir(path).await;
+}
+
+pub async fn rename(action: RenameAction) {
+    let _ = fs::rename(action.from, action.to).await;
+}
+
+pub async fn delete_file(path: String) {
+    let _ = fs::remove_file(path).await;
+}
+
+pub async fn delete_folder(path: String) {
+    let _ = fs::remove_dir_all(path).await;
 }

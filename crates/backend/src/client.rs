@@ -165,6 +165,9 @@ impl RequestHandler {
                 }
                 ActionFrontendMessage::NewFile(path) => actions::new_file(path).await,
                 ActionFrontendMessage::NewFolder(path) => actions::new_folder(path).await,
+                ActionFrontendMessage::Rename(action) => actions::rename(action).await,
+                ActionFrontendMessage::DeleteFile(path) => actions::delete_file(path).await,
+                ActionFrontendMessage::DeleteFolder(path) => actions::delete_folder(path).await,
             },
         }
     }

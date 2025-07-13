@@ -56,6 +56,9 @@ pub async fn router(req: ServerRequest) -> Result<BuiltResponse, std::convert::I
         (GET, ["browser", "actions"]) => browser::actions,
         (POST, ["browser", "actions", "new-file"]) => browser::new_file,
         (POST, ["browser", "actions", "new-folder"]) => browser::new_folder,
+        (POST, ["browser", "actions", "rename"]) => browser::rename,
+        (POST, ["browser", "actions", "delete-file"]) => browser::delete_file,
+        (POST, ["browser", "actions", "delete-folder"]) => browser::delete_folder,
 
         _ => || { ServerResponse::new().status(StatusCode::NOT_FOUND).body("page not found") },
     });

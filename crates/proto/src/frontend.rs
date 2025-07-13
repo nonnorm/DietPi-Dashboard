@@ -28,6 +28,9 @@ pub enum ActionFrontendMessage {
     Signal(SignalAction),
     NewFile(String),
     NewFolder(String),
+    Rename(RenameAction),
+    DeleteFile(String),
+    DeleteFolder(String),
 }
 
 #[derive(Debug, Encode, Decode, Deserialize)]
@@ -49,4 +52,10 @@ pub enum Signal {
 pub struct CommandAction {
     pub cmd: String,
     pub args: Vec<String>,
+}
+
+#[derive(Debug, Encode, Decode)]
+pub struct RenameAction {
+    pub from: String,
+    pub to: String,
 }
