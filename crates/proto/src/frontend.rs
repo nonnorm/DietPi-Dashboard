@@ -32,6 +32,7 @@ pub enum ActionFrontendMessage {
     Rename(RenameAction),
     DeleteFile(String),
     DeleteFolder(String),
+    Upload(UploadAction),
 }
 
 #[derive(Debug, Encode, Decode, Deserialize)]
@@ -59,4 +60,10 @@ pub struct CommandAction {
 pub struct RenameAction {
     pub from: String,
     pub to: String,
+}
+
+#[derive(Debug, Encode, Decode)]
+pub struct UploadAction {
+    pub path: String,
+    pub data: Vec<u8>,
 }

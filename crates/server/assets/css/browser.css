@@ -11,43 +11,45 @@ code-editor {
         background-color: transparent;
         color: transparent;
         caret-color: light-dark(black, white);
-        border: none;
+        border: solid var(--gray-4) var(--border-size-1);
     }
 
     > pre {
         grid-area: 1 / 1;
 
         pointer-events: none;
+
+        border: solid var(--gray-4) var(--border-size-1);
     }
 }
 
 #browser-swap {
     display: grid;
     grid-template-columns: 1fr var(--size-9);
-    grid-template-rows: var(--size-7) 1fr;
+    grid-template-rows: auto 1fr;
     grid-template-areas:
         "path    --   "
         "table actions";
     gap: var(--size-4);
 }
 
-table#browser-inner {
+#browser-inner {
     grid-area: table;
     align-self: start;
+}
 
-    tr {
-        user-select: none;
+table#browser-inner tr {
+    user-select: none;
 
-        button {
-            text-align: start;
+    button {
+        text-align: start;
 
-            width: 100%;
-            height: 100%;
-        }
+        width: 100%;
+        height: 100%;
+    }
 
-        &[aria-current="true"] {
-            background-color: light-dark(var(--dietpi-dark), var(--dietpi-teal-dark));
-        }
+    &[aria-current="true"] {
+        background-color: light-dark(var(--dietpi-dark), var(--dietpi-teal-dark));
     }
 }
 
@@ -58,11 +60,11 @@ table#browser-inner {
     align-items: center;
     gap: var(--size-1);
 
-    padding: var(--size-2);
+    padding-inline: var(--size-2);
 
     background-color: light-dark(var(--gray-4), var(--gray-8));
 
-    button {
+    button, span {
         padding: var(--size-1);
 
         background-color: transparent;

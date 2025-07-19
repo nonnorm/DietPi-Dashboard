@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use proto::frontend::{RenameAction, Signal as FrontendSignal, SignalAction};
+use proto::frontend::{RenameAction, Signal as FrontendSignal, SignalAction, UploadAction};
 use sysinfo::{Pid, Signal};
 use tokio::fs;
 
@@ -44,4 +44,8 @@ pub async fn delete_file(path: String) {
 
 pub async fn delete_folder(path: String) {
     let _ = fs::remove_dir_all(path).await;
+}
+
+pub async fn write(action: UploadAction) {
+    let _ = fs::write(action.path, action.data).await;
 }

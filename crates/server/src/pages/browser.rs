@@ -1,9 +1,13 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
+use data_encoding::BASE64;
 use hyper::StatusCode;
 use maud::{Markup, html};
 use pretty_bytes_typed::pretty_bytes;
-use proto::{backend::FileKind, frontend::RenameAction};
+use proto::{
+    backend::FileKind,
+    frontend::{RenameAction, UploadAction},
+};
 use serde::Deserialize;
 
 use crate::{
@@ -18,10 +22,6 @@ use super::template::{send_req, template};
 
 fn default_path() -> String {
     "/root".into()
-}
-
-fn default_kind() -> FileKind {
-    FileKind::Directory
 }
 
 #[derive(Deserialize)]
@@ -39,16 +39,7 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
 
     let content = html! {
         #browser-swap nm-data="selectedRow: null" {
-            #path-display {
-                @let paths = query.path.split_inclusive('/').scan(String::new(), |acc, segment| {
-                    acc.push_str(segment);
-                    Some((acc.clone(), segment))
-                });
-
-                @for (full_path, path_segment) in paths {
-                    button data-path=(full_path) nm-bind={"onclick: () => get('/browser', {path: this.dataset.path})"} { (path_segment) }
-                }
-            }
+            (path_display(&query.path))
 
             table #browser-inner {
                 tr {
@@ -64,11 +55,17 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
                         FileKind::Special => "fa6-solid-cube",
                     };
                     @let pretty_size = item.size.map(|size| pretty_bytes(size, Some(0)).to_string()).unwrap_or_else(|| "--".into());
+                    @let dblclick = match item.kind {
+                        FileKind::TextFile => "get('/browser/file', {path});",
+                        FileKind::Directory => "get('/browser', {path});",
+                        FileKind::BinaryFile => "window.open(`/browser/actions/download?path=${path}`)",
+                        FileKind::Special => "",
+                    };
                     tr
                         data-current-path=(query.path)
                         data-path=(item.path)
                         data-kind=(serde_plain::to_string(&item.kind).unwrap())
-                        nm-bind="
+                        nm-bind={"
                             ariaCurrent: () => selectedRow === this,
                             onclick: () => {
                                 let {currentPath, path, kind} = this.dataset;
@@ -76,9 +73,10 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
                                 get('/browser/actions', {currentPath, path, kind})
                             },
                             ondblclick: () => {
-                                get('/browser', {path: this.dataset.path});
+                                let {path} = this.dataset;
+                                "(dblclick)"
                             }
-                        "
+                        "}
                     {
                         td {
                             (Icon::new(icon).size(18)) " " (name)
@@ -94,6 +92,65 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
     };
 
     template(&req, content)
+}
+
+pub async fn file(req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
+    req.check_login()?;
+
+    let query: BrowserQuery = req.extract_query()?;
+
+    let data = send_req!(req, Download(query.path.clone()))?;
+    let data = String::from_utf8(data).map_err(|_| {
+        ServerResponse::new()
+            .status(StatusCode::BAD_REQUEST)
+            .body("not a text file")
+    })?;
+
+    let content = html! {
+        #browser-swap nm-data="data: ''" {
+            (path_display(&query.path))
+
+            code-editor #browser-inner {
+                textarea nm-bind="oninput: () => data = this.value" {
+                    (data)
+                }
+                pre {}
+            }
+            #actions-list {
+                button title="Save" nm-bind={"
+                    onclick: () => {
+                        post('/browser/file/save', {path: '"(query.path)"', data});
+                    }
+                "} {
+                    (Icon::new("fa6-solid-floppy-disk"))
+                }
+            }
+        }
+    };
+
+    template(&req, content)
+}
+
+fn path_display(path: &str) -> Markup {
+    let mut paths = path
+        .split_inclusive('/')
+        .scan(String::new(), |acc, segment| {
+            acc.push_str(segment);
+            Some((acc.clone(), segment))
+        })
+        .peekable();
+
+    html! {
+        #path-display {
+            @while let Some((full_path, path_segment)) = paths.next() {
+                @if paths.peek().is_none() {
+                    span { (path_segment) }
+                } @else {
+                    button data-path=(full_path) nm-bind={"onclick: () => get('/browser', {path: this.dataset.path})"} { (path_segment) }
+                }
+            }
+        }
+    }
 }
 
 #[derive(Deserialize)]
@@ -169,6 +226,27 @@ fn default_actions(current_path: &str) -> Markup {
                 if (name) post('/browser/actions/new-folder', {parent: '"(current_path)"', name});
             }
         "} { (Icon::new("fa6-solid-folder-plus")) }
+        button title="Upload" onclick="this.firstChild.click()" {
+            input type="file" hidden nm-bind={"
+                onchange: () => {
+                    let file = this.files[0];
+                    if (!file) return;
+    
+                    let reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.addEventListener('load', () => {
+                        let data = reader.result.replace(/^data:.*;base64,/, '');
+    
+                        post('/browser/actions/upload', {
+                            parent: '"(current_path)"',
+                            name: file.name,
+                            data
+                        })
+                    });
+                }
+            "};
+            (Icon::new("fa6-solid-file-arrow-up"))
+        }
     }
 }
 
@@ -183,9 +261,11 @@ pub async fn new_file(mut req: ServerRequest) -> Result<ServerResponse, ServerRe
 
     let query: NewQuery = req.extract_form().await?;
 
-    let path = format!("{}{}", query.parent, query.name);
+    let mut path = PathBuf::from(&query.parent);
+    path.push(query.name);
+    let path = path.to_str().unwrap();
 
-    send_act!(req, NewFile(path))?;
+    send_act!(req, NewFile(path.into()))?;
 
     Ok(ServerResponse::new().redirect(
         RedirectType::SeeOther,
@@ -226,7 +306,7 @@ pub async fn rename(mut req: ServerRequest) -> Result<ServerResponse, ServerResp
             .status(StatusCode::BAD_REQUEST)
             .body("can't get parent of path"),
     )?;
-    let parent = parent.as_os_str().to_str().unwrap();
+    let parent = parent.to_str().unwrap();
 
     let new_path = Path::new(&query.path).with_file_name(&query.new_name);
     let new_path = new_path.into_os_string().into_string().unwrap();
@@ -256,7 +336,7 @@ pub async fn delete_file(mut req: ServerRequest) -> Result<ServerResponse, Serve
             .status(StatusCode::BAD_REQUEST)
             .body("can't get parent of path"),
     )?;
-    let parent = parent.as_os_str().to_str().unwrap();
+    let parent = parent.to_str().unwrap();
 
     send_act!(req, DeleteFile(query.path.clone()))?;
 
@@ -273,7 +353,7 @@ pub async fn delete_folder(mut req: ServerRequest) -> Result<ServerResponse, Ser
             .status(StatusCode::BAD_REQUEST)
             .body("can't get parent of path"),
     )?;
-    let parent = parent.as_os_str().to_str().unwrap();
+    let parent = parent.to_str().unwrap();
 
     send_act!(req, DeleteFolder(query.path.clone()))?;
 
@@ -285,7 +365,61 @@ pub async fn download(req: ServerRequest) -> Result<ServerResponse, ServerRespon
 
     let query: FileQuery = req.extract_query()?;
 
-    let data = send_req!(req, Download(query.path.clone()))?;
+    let data = send_req!(req, Download(query.path))?;
 
     Ok(ServerResponse::new().body(data))
+}
+
+#[derive(Deserialize)]
+pub struct SaveForm {
+    path: String,
+    data: String,
+}
+
+pub async fn save(mut req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
+    req.check_login()?;
+
+    let query: SaveForm = req.extract_form().await?;
+
+    let action = UploadAction {
+        path: query.path,
+        data: query.data.into_bytes(),
+    };
+    send_act!(req, Upload(action))?;
+
+    Ok(ServerResponse::new())
+}
+
+#[derive(Deserialize)]
+pub struct UploadForm {
+    name: String,
+    parent: String,
+    data: String,
+}
+
+pub async fn upload(mut req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
+    req.check_login()?;
+
+    let query: UploadForm = req.extract_form().await?;
+
+    let mut path = PathBuf::from(&query.parent);
+    path.push(query.name);
+    let path = path.to_str().unwrap();
+
+    let data = BASE64.decode(query.data.as_bytes()).map_err(|_| {
+        ServerResponse::new()
+            .status(StatusCode::BAD_REQUEST)
+            .body("invalid base64")
+    })?;
+
+    let action = UploadAction {
+        path: path.into(),
+        data,
+    };
+    send_act!(req, Upload(action))?;
+
+    Ok(ServerResponse::new().redirect(
+        RedirectType::SeeOther,
+        &format!("/browser?path={}", query.parent),
+    ))
 }

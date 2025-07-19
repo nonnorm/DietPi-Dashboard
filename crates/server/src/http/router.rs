@@ -53,6 +53,8 @@ pub async fn router(req: ServerRequest) -> Result<BuiltResponse, std::convert::I
         (GET, ["terminal", "ws"]) => terminal::socket,
 
         (GET, ["browser"]) => browser::page,
+        (GET, ["browser", "file"]) => browser::file,
+        (POST, ["browser", "file", "save"]) => browser::save,
         (GET, ["browser", "actions"]) => browser::actions,
         (POST, ["browser", "actions", "new-file"]) => browser::new_file,
         (POST, ["browser", "actions", "new-folder"]) => browser::new_folder,
@@ -60,6 +62,7 @@ pub async fn router(req: ServerRequest) -> Result<BuiltResponse, std::convert::I
         (POST, ["browser", "actions", "delete-file"]) => browser::delete_file,
         (POST, ["browser", "actions", "delete-folder"]) => browser::delete_folder,
         (GET, ["browser", "actions", "download"]) => browser::download,
+        (POST, ["browser", "actions", "upload"]) => browser::upload,
 
         _ => || { ServerResponse::new().status(StatusCode::NOT_FOUND).body("page not found") },
     });
