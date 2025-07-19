@@ -20,6 +20,7 @@ pub enum RequestFrontendMessage {
     Command(CommandAction),
     Services,
     Directory(String),
+    Download(String),
 }
 
 #[derive(Debug, Encode, Decode)]

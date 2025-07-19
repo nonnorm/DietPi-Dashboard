@@ -149,6 +149,7 @@ impl RequestHandler {
                     Command(action) => getters::command,
                     Services => getters::services,
                     Directory(path) => getters::list_directory,
+                    Download(path) => getters::read_file,
                 });
 
                 let resp = BackendMessage::Response(id, resp);

@@ -20,6 +20,10 @@ fn default_path() -> String {
     "/root".into()
 }
 
+fn default_kind() -> FileKind {
+    FileKind::Directory
+}
+
 #[derive(Deserialize)]
 pub struct BrowserQuery {
     #[serde(default = "default_path")]
@@ -42,11 +46,11 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
                 });
 
                 @for (full_path, path_segment) in paths {
-                    button nm-bind={"onclick: () => get('/browser', {path: '"(full_path)"'})"} { (path_segment) }
+                    button data-path=(full_path) nm-bind={"onclick: () => get('/browser', {path: this.dataset.path})"} { (path_segment) }
                 }
             }
 
-            table #browser-table {
+            table #browser-inner {
                 tr {
                     th { "File Name" }
                     th { "File Size" }
@@ -60,21 +64,22 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
                         FileKind::Special => "fa6-solid-cube",
                     };
                     @let pretty_size = item.size.map(|size| pretty_bytes(size, Some(0)).to_string()).unwrap_or_else(|| "--".into());
-                    tr nm-bind={"
-                        ariaCurrent: () => selectedRow === this,
-                        hidden: () => this.dataset.hidden !== undefined && !viewHidden,
-                        onclick: () => {
-                            selectedRow = this;
-                            get('/browser/actions', {
-                                currentPath: '"(query.path)"',
-                                path: '"(item.path)"',
-                                kind: '"(serde_plain::to_string(&item.kind).unwrap())"'
-                            })
-                        },
-                        ondblclick: () => {
-                            get('/browser', {path: '"(item.path)"'});
-                        }
-                    "} {
+                    tr
+                        data-current-path=(query.path)
+                        data-path=(item.path)
+                        data-kind=(serde_plain::to_string(&item.kind).unwrap())
+                        nm-bind="
+                            ariaCurrent: () => selectedRow === this,
+                            onclick: () => {
+                                let {currentPath, path, kind} = this.dataset;
+                                selectedRow = this;
+                                get('/browser/actions', {currentPath, path, kind})
+                            },
+                            ondblclick: () => {
+                                get('/browser', {path: this.dataset.path});
+                            }
+                        "
+                    {
                         td {
                             (Icon::new(icon).size(18)) " " (name)
                         }
@@ -127,6 +132,11 @@ pub async fn actions(req: ServerRequest) -> Result<ServerResponse, ServerRespons
                             post('/browser/actions/delete-file', {path: '"(query.path)"'});
                     }
                 "} { (Icon::new("fa6-solid-trash")) }
+                button title="Download" nm-bind={"
+                    onclick: () => { 
+                        window.open('/browser/actions/download?path="(query.path)"')
+                    }
+                "} { (Icon::new("fa6-solid-file-arrow-down")) }
             }
             @if matches!(query.kind, FileKind::Directory)  {
                 button title="Delete" nm-bind={"
@@ -268,4 +278,14 @@ pub async fn delete_folder(mut req: ServerRequest) -> Result<ServerResponse, Ser
     send_act!(req, DeleteFolder(query.path.clone()))?;
 
     Ok(ServerResponse::new().redirect(RedirectType::SeeOther, &format!("/browser?path={parent}")))
+}
+
+pub async fn download(req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
+    req.check_login()?;
+
+    let query: FileQuery = req.extract_query()?;
+
+    let data = send_req!(req, Download(query.path.clone()))?;
+
+    Ok(ServerResponse::new().body(data))
 }

@@ -31,7 +31,7 @@ code-editor {
     gap: var(--size-4);
 }
 
-#browser-table {
+table#browser-inner {
     grid-area: table;
     align-self: start;
 
@@ -46,7 +46,7 @@ code-editor {
         }
 
         &[aria-current="true"] {
-            background-color: light-dark(var(--dietpi-light), var(--dietpi-teal-light));
+            background-color: light-dark(var(--dietpi-dark), var(--dietpi-teal-dark));
         }
     }
 }

@@ -105,12 +105,6 @@
                 },
             });
 
-            Object.entries(rawData).forEach(([key, val]) => {
-                if (typeof key === "function") {
-                    rawData[key] = val.bind(proxyData);
-                }
-            });
-
             dataEl.nmProxy = proxyData;
         });
 

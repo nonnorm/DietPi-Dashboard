@@ -15,7 +15,7 @@ pub struct DashboardSocket {
 impl DashboardSocket {
     pub fn new(stream: TcpStream, key: [u8; 32]) -> Self {
         let framed = LengthDelimitedCodec::builder()
-            .length_field_type::<u16>()
+            .length_field_type::<u32>()
             .new_framed(stream);
 
         // Length of buffer is guaranteed to be 32 bytes
@@ -37,7 +37,7 @@ impl DashboardSocket {
                     let data = self
                         .key
                         .open_in_place(nonce, Aad::empty(), &mut data)
-                        .map_err(|_| io::Error::new(io::ErrorKind::Other, "decryption failed"))?;
+                        .map_err(|_| io::Error::other("decryption failed"))?;
 
                     bitcode::decode(data)
                         .map_err(|err| io::Error::new(io::ErrorKind::InvalidData, err.to_string()))
@@ -54,7 +54,7 @@ impl DashboardSocket {
 
         self.key
             .seal_in_place_append_tag(Nonce::assume_unique_for_key(nonce), Aad::empty(), &mut data)
-            .map_err(|_| io::Error::new(io::ErrorKind::Other, "encryption failed"))?;
+            .map_err(|_| io::Error::other("encryption failed"))?;
 
         data.extend(nonce);
 
