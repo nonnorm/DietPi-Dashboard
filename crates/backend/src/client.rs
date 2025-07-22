@@ -81,7 +81,7 @@ impl BackendClient {
         })
     }
 
-    pub async fn run(mut self) -> Result<()> {
+    pub async fn run(&mut self) -> Result<()> {
         self.send_handshake().await?;
 
         loop {

@@ -1,4 +1,7 @@
-use std::sync::{Arc, Mutex};
+use std::{
+    sync::{Arc, Mutex},
+    time::{Duration, Instant},
+};
 
 use anyhow::{Context, Result};
 use client::{BackendClient, BackendContext, SystemComponents};
@@ -10,6 +13,7 @@ use log::{error, info};
 use simple_logger::SimpleLogger;
 use terminal::Terminal;
 use tokio::sync::mpsc;
+use tryhard::RetryFutureConfig;
 
 mod actions;
 mod client;
@@ -45,10 +49,33 @@ async fn main() -> Result<()> {
         socket_tx,
     };
 
-    let client = BackendClient::new(context, socket_rx).await?;
+    let mut client = BackendClient::new(context, socket_rx).await?;
 
-    if let Err(err) = client.run().await {
-        error!("{err:#}");
+    let mut errors = 0;
+    let mut last_attempt = Instant::now();
+
+    loop {
+        if let Err(err) = client.run().await {
+            error!("{err:#}");
+
+            if Instant::now().duration_since(last_attempt) < Duration::from_secs(30) {
+                errors += 1;
+            } else {
+                errors = 0;
+            }
+
+            let capped_errors = errors.min(9);
+            let timeout = Duration::from_secs(2_u64.pow(capped_errors));
+
+            info!(
+                "retrying in {} secs, errored {errors} times",
+                timeout.as_secs()
+            );
+
+            tokio::time::sleep(timeout).await;
+
+            last_attempt = Instant::now();
+        }
     }
 
     Ok(())
