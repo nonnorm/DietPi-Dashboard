@@ -24,7 +24,7 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
 pub async fn socket(req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
     req.check_login()?;
 
-    let backend = req.extract_backends()?.current_backend.1;
+    let backend = req.extract_backends()?.current_backend.handle;
 
     req.extract_websocket(async move |mut ws| {
         let mut term_rx = backend.get_terminal_handle().await.unwrap();

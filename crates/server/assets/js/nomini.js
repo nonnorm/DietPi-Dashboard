@@ -95,11 +95,16 @@
 
                     return obj[prop];
                 },
-
                 set(obj, prop, val) {
                     obj[prop] = val;
 
+                    // Required to prevent infinite loops (this took 3 hours to debug!)
+                    let thisBind = currentBind;
+                    currentBind = null;
+
                     trackedDeps[prop].forEach(fn => fn());
+
+                    currentBind = thisBind;
 
                     return true;
                 },
@@ -118,7 +123,7 @@
                     bindEl,
                 );
 
-                Object.entries(props).forEach(async ([key, val]) => {
+                Object.entries(props).forEach(([key, val]) => {
                     if (key.startsWith("on")) {
                         bindEl[key] = val;
                     } else {

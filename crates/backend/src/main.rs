@@ -10,6 +10,7 @@ use config::{
     backend::{BackendConfig, get_config},
 };
 use log::{error, info};
+use proto::backend::BackendMessage;
 use simple_logger::SimpleLogger;
 use terminal::Terminal;
 use tokio::sync::mpsc;
@@ -20,6 +21,14 @@ mod getters;
 mod terminal;
 
 pub type SharedConfig = Arc<BackendConfig>;
+
+async fn run_client(
+    context: BackendContext,
+    rx: &mut mpsc::UnboundedReceiver<BackendMessage>,
+) -> Result<()> {
+    let client = BackendClient::new(context.clone(), rx).await?;
+    client.run().await
+}
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<()> {
@@ -35,7 +44,7 @@ async fn main() -> Result<()> {
     info!("Connecting to {}", config.frontend_addr);
 
     let (term_tx, term_rx) = mpsc::unbounded_channel();
-    let (socket_tx, socket_rx) = mpsc::unbounded_channel();
+    let (socket_tx, mut socket_rx) = mpsc::unbounded_channel();
 
     let terminal = Terminal::new(socket_tx.clone(), term_rx).context("terminal build error")?;
     tokio::spawn(terminal.run());
@@ -48,13 +57,11 @@ async fn main() -> Result<()> {
         socket_tx,
     };
 
-    let mut client = BackendClient::new(context, socket_rx).await?;
-
     let mut errors = 0;
     let mut last_attempt = Instant::now();
 
     loop {
-        if let Err(err) = client.run().await {
+        if let Err(err) = run_client(context.clone(), &mut socket_rx).await {
             error!("{err:#}");
 
             if Instant::now().duration_since(last_attempt) < Duration::from_secs(30) {
@@ -76,6 +83,4 @@ async fn main() -> Result<()> {
             last_attempt = Instant::now();
         }
     }
-
-    Ok(())
 }

@@ -48,7 +48,13 @@ fn get_cookies(parts: &RequestParts) -> HashMap<String, String> {
 
 pub struct BackendData {
     pub backend_list: Vec<(IpAddr, String)>,
-    pub current_backend: (IpAddr, BackendHandle),
+    pub current_backend: CurrentBackendData,
+}
+
+pub struct CurrentBackendData {
+    pub addr: IpAddr,
+    pub handle: BackendHandle,
+    pub update: Option<String>,
 }
 
 pub struct ServerRequest {
@@ -99,12 +105,16 @@ impl ServerRequest {
                 .get("backend")
                 .and_then(|x| x.parse::<IpAddr>().ok());
 
-            let (addr, backend_info) = cookie_ip
+            let (&addr, backend_info) = cookie_ip
                 .and_then(|x| backends.get_key_value(&x))
                 .or_else(|| backends.get_key_value(&backend_list[0].0))
                 .unwrap();
 
-            (*addr, backend_info.handle.clone())
+            CurrentBackendData {
+                addr,
+                handle: backend_info.handle.clone(),
+                update: backend_info.update.clone(),
+            }
         };
 
         Ok(BackendData {
@@ -117,7 +127,7 @@ impl ServerRequest {
         &self,
         req: RequestFrontendMessage,
     ) -> Result<ResponseBackendMessage, ServerResponse> {
-        let backend_handle = self.extract_backends()?.current_backend.1;
+        let backend_handle = self.extract_backends()?.current_backend.handle;
 
         backend_handle.send_req(req).await.map_err(|err| {
             ServerResponse::new()
@@ -130,7 +140,7 @@ impl ServerRequest {
         &self,
         msg: ActionFrontendMessage,
     ) -> Result<(), ServerResponse> {
-        let backend_handle = self.extract_backends()?.current_backend.1;
+        let backend_handle = self.extract_backends()?.current_backend.handle;
 
         backend_handle.send_action(msg).await.map_err(|err| {
             ServerResponse::new()

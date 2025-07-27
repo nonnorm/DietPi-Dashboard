@@ -19,6 +19,7 @@ use super::{SharedBackendRegistry, cache::BackendCache};
 #[derive(Debug)]
 pub struct BackendInfo {
     pub nickname: String,
+    pub update: Option<String>,
     pub handle: BackendHandle,
 }
 
@@ -80,6 +81,7 @@ impl BackendConnection {
 
         let conn_info = BackendInfo {
             nickname,
+            update: handshake.update,
             handle: BackendHandle::new(tx),
         };
 

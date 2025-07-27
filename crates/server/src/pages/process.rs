@@ -1,9 +1,6 @@
 use maud::{Markup, html};
 use pretty_bytes_typed::pretty_bytes_binary;
-use proto::{
-    backend::ProcessStatus,
-    frontend::{ActionFrontendMessage, SignalAction},
-};
+use proto::{backend::ProcessStatus, frontend::SignalAction};
 use serde::{Deserialize, Serialize};
 
 use crate::http::{request::ServerRequest, response::ServerResponse};

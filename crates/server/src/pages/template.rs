@@ -52,7 +52,7 @@ fn header(req: &ServerRequest) -> Result<Markup, ServerResponse> {
                     onchange="document.cookie = `backend=${this.value}; MaxAge=999999999`; window.location.reload()"
                 {
                     @for backend in backend_list {
-                        @let is_current_backend = backend.0 == current_backend.0;
+                        @let is_current_backend = backend.0 == current_backend.addr;
                         option value=(backend.0) selected[is_current_backend] {
                             (backend.1) " (" (backend.0) ")"
                         }
@@ -65,6 +65,7 @@ fn header(req: &ServerRequest) -> Result<Markup, ServerResponse> {
                 nm-bind="onclick: () => msgsOpen = !msgsOpen, ariaExpanded: () => msgsOpen"
             {
                 (Icon::new("fa6-solid-envelope"))
+                span nm-bind="hidden: () => !newMsg" { (Icon::new("svg-spinners-pulse")) }
             }
 
             span nm-data="isDark: localStorage.getItem('darkMode') === 'true'" {
@@ -89,9 +90,14 @@ fn header(req: &ServerRequest) -> Result<Markup, ServerResponse> {
         }
         #msgs {
             ul {
-                li
-                    nm-bind={ "textContent: () => getUpdateMessage('"(config::APP_VERSION)"')" }
-                {}
+                li nm-bind={"textContent: async () => {
+                    const msg = await getUpdateMessage('"(config::APP_VERSION)"');
+                    newMsg = !!msg;
+                    return msg;
+                }"} {}
+                @if let Some(update) = current_backend.update {
+                    li nm-bind="_: () => newMsg = true" { "DietPi Update Available: " (update) }
+                }
             }
         }
     })
@@ -159,7 +165,7 @@ pub fn template(req: &ServerRequest, content: Markup) -> Result<ServerResponse, 
                     link rel="stylesheet" href="/static/main.css";
                 }
                 body
-                    nm-data="navOpen: true, msgsOpen: false"
+                    nm-data="navOpen: true, msgsOpen: false, newMsg: false,"
                     nm-bind="className: () => `${navOpen ? '' : 'nav-closed'} ${msgsOpen ? 'msgs-open' : ''}`"
                 {
                     h1 { "DietPi Dashboard" }

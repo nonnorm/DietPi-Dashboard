@@ -8,7 +8,7 @@ use proto::{
     frontend::{ActionFrontendMessage, FrontendMessage, RequestFrontendMessage},
 };
 use sysinfo::{Components, Disks, Networks, System};
-use tokio::{net::TcpStream, sync::mpsc};
+use tokio::{fs, net::TcpStream, sync::mpsc};
 
 use crate::{SharedConfig, actions, getters};
 
@@ -59,16 +59,16 @@ impl BackendContext {
     }
 }
 
-pub struct BackendClient {
+pub struct BackendClient<'a> {
     socket: DashboardSocket,
     context: BackendContext,
-    rx: mpsc::UnboundedReceiver<BackendMessage>,
+    rx: &'a mut mpsc::UnboundedReceiver<BackendMessage>,
 }
 
-impl BackendClient {
+impl<'a> BackendClient<'a> {
     pub async fn new(
         context: BackendContext,
-        rx: mpsc::UnboundedReceiver<BackendMessage>,
+        rx: &'a mut mpsc::UnboundedReceiver<BackendMessage>,
     ) -> Result<Self> {
         let stream = TcpStream::connect(context.config.frontend_addr)
             .await
@@ -81,7 +81,7 @@ impl BackendClient {
         })
     }
 
-    pub async fn run(&mut self) -> Result<()> {
+    pub async fn run(mut self) -> Result<()> {
         self.send_handshake().await?;
 
         loop {
@@ -106,9 +106,13 @@ impl BackendClient {
 
     async fn send_handshake(&mut self) -> Result<()> {
         let nickname = self.context.config.nickname.clone();
+        let update = fs::read_to_string("/run/dietpi/.update_available")
+            .await
+            .ok();
 
         let handshake = Handshake {
             nickname,
+            update,
             version: PROTOCOL_VERSION,
         };
 

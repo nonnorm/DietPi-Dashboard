@@ -32,6 +32,7 @@ pub enum ResponseBackendMessage {
 #[derive(Debug, Clone, Encode, Decode)]
 pub struct Handshake {
     pub nickname: String,
+    pub update: Option<String>,
     pub version: u32,
 }
 
