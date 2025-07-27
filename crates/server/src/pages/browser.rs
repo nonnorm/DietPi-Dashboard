@@ -35,10 +35,12 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
 
     let query: BrowserQuery = req.extract_query()?;
 
-    let data = send_req!(req, Directory(query.path.clone()))?;
+    let mut data = send_req!(req, Directory(query.path.clone()))?;
+
+    data.dir_list.sort_by(|a, b| a.path.cmp(&b.path));
 
     let content = html! {
-        #browser-swap nm-data="selectedRow: null" {
+        #browser-swap nm-data="selectedRow: null, viewHidden: false" {
             (path_display(&query.path))
 
             table #browser-inner {
@@ -48,6 +50,7 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
                 }
                 @for item in data.dir_list {
                     @let name = item.path.rsplit_once('/').map(|(_, name)| name).unwrap_or(&item.path);
+                    @let is_hidden = name.starts_with('.');
                     @let icon = match item.kind {
                         FileKind::TextFile => "fa6-solid-file-lines",
                         FileKind::BinaryFile => "fa6-solid-file",
@@ -65,6 +68,7 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
                         data-current-path=(query.path)
                         data-path=(item.path)
                         data-kind=(serde_plain::to_string(&item.kind).unwrap())
+                        data-hidden[is_hidden]
                         nm-bind={"
                             ariaCurrent: () => selectedRow === this,
                             onclick: () => {
@@ -75,7 +79,8 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
                             ondblclick: () => {
                                 let {path} = this.dataset;
                                 "(dblclick)"
-                            }
+                            },
+                            hidden: () => this.hasAttribute('data-hidden') && !viewHidden
                         "}
                     {
                         td {
@@ -214,6 +219,14 @@ fn default_actions(current_path: &str) -> Markup {
         button title="Refresh" nm-bind={ "onclick: () => get('/browser', {path: '"(current_path)"'})" } {
             (Icon::new("fa6-solid-rotate"))
         }
+        button title="Hide Hidden Files" nm-bind="
+            onclick: () => viewHidden = true,
+            hidden: () => viewHidden,
+        " { (Icon::new("fa6-solid-eye")) }
+        button title="Show Hidden Files" nm-bind="
+            onclick: () => viewHidden = false,
+            hidden: () => !viewHidden,
+        " { (Icon::new("fa6-solid-eye-slash")) }
         button title="New File" nm-bind={"
             onclick: () => { 
                 let name = prompt('Enter a file name:');

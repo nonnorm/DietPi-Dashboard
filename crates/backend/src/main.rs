@@ -13,7 +13,6 @@ use log::{error, info};
 use simple_logger::SimpleLogger;
 use terminal::Terminal;
 use tokio::sync::mpsc;
-use tryhard::RetryFutureConfig;
 
 mod actions;
 mod client;
