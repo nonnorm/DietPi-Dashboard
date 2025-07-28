@@ -221,6 +221,36 @@ dependencies = [
 ]
 
 [[package]]
+name = "frontend"
+version = "0.7.0"
+dependencies = [
+ "anyhow",
+ "bitcode",
+ "config",
+ "data-encoding",
+ "ephemeropt",
+ "flexible-hyper-server-tls",
+ "futures-util",
+ "http-body-util",
+ "humantime",
+ "hyper",
+ "hyper-util",
+ "log",
+ "maud",
+ "pretty-bytes-typed",
+ "proto",
+ "rand",
+ "ring",
+ "serde",
+ "serde_plain",
+ "serde_urlencoded",
+ "simple_logger",
+ "slab",
+ "tokio",
+ "tokio-tungstenite",
+]
+
+[[package]]
 name = "futures-channel"
 version = "0.3.31"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -781,36 +811,6 @@ dependencies = [
  "itoa",
  "ryu",
  "serde",
-]
-
-[[package]]
-name = "server"
-version = "0.7.0"
-dependencies = [
- "anyhow",
- "bitcode",
- "config",
- "data-encoding",
- "ephemeropt",
- "flexible-hyper-server-tls",
- "futures-util",
- "http-body-util",
- "humantime",
- "hyper",
- "hyper-util",
- "log",
- "maud",
- "pretty-bytes-typed",
- "proto",
- "rand",
- "ring",
- "serde",
- "serde_plain",
- "serde_urlencoded",
- "simple_logger",
- "slab",
- "tokio",
- "tokio-tungstenite",
 ]
 
 [[package]]

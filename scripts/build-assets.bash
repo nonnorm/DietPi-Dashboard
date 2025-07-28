@@ -1,7 +1,7 @@
 #!/bin/bash -ex
 
-asset_path='crates/server/assets'
-dist_path='crates/server/dist'
+asset_path='crates/frontend/assets'
+dist_path='crates/frontend/dist'
 
 js_assets=(
   "$asset_path/js/xterm-5.5.0.js"
