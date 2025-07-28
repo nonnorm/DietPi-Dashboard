@@ -42,7 +42,7 @@ jobs:
       - name: Upload frontend binary
         uses: actions/upload-artifact@v4
         with:
-          name: dietpi-dashboard-${{ matrix.job.pretty }}-server
+          name: dietpi-dashboard-${{ matrix.job.pretty }}-frontend
           path: target/${{ matrix.job.target }}/release/server
       - name: Upload backend binary
         uses: actions/upload-artifact@v4
