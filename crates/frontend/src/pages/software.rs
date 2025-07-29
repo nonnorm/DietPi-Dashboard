@@ -1,5 +1,8 @@
 use maud::{Markup, html};
-use proto::{backend::SoftwareInfo, frontend::CommandAction};
+use proto::{
+    backend::{SoftwareInfo, SoftwareResponse},
+    frontend::CommandAction,
+};
 use serde::Deserialize;
 
 use crate::{
@@ -9,51 +12,75 @@ use crate::{
 
 use super::template::{send_req, template};
 
-fn software_table(list: &[SoftwareInfo], pretty_action: &str, action: &str) -> Markup {
+fn software_table(list: &[SoftwareInfo], idx: u8, pretty_action: &str, action: &str) -> Markup {
     html! {
-        div nm-data="software: new Map()" {
-            table {
-                tr {
-                    th { "Name" }
-                    th { "Description" }
-                    th { "Dependencies" }
-                    th { "Docs" }
-                    th { (pretty_action) }
-                }
-                @for item in list {
+        div nm-bind={"hidden: () => activeIdx !== " (idx)} {
+            div nm-data="software: new Map()" {
+                table {
                     tr {
-                        td { (item.name) }
-                        td { (item.desc) }
-                        td { (item.deps) }
-                        td {
-                            @if item.docs.starts_with("http") {
-                                a href=(item.docs) { (item.docs) }
-                            } @else {
-                                (item.docs)
+                        th { "Name" }
+                        th { "Description" }
+                        th { "Dependencies" }
+                        th { "Docs" }
+                        th { (pretty_action) }
+                    }
+                    @for item in list {
+                        tr {
+                            td { (item.name) }
+                            td { (item.desc) }
+                            td { (item.deps) }
+                            td {
+                                @if item.docs.starts_with("http") {
+                                    a href=(item.docs) { (item.docs) }
+                                } @else {
+                                    (item.docs)
+                                }
                             }
-                        }
-                        td {
-                            input type="checkbox" nm-bind={
-                                "onchange: () => {
-                                    this.checked ? software.set("(item.id)", '"(item.name)"') : software.delete("(item.id)");
-                                    software = software;
-                                }"
-                            };
+                            td {
+                                input type="checkbox" nm-bind={
+                                    "onchange: () => {
+                                        this.checked ? software.set("(item.id)", '"(item.name)"') : software.delete("(item.id)");
+                                        software = software;
+                                    }"
+                                };
+                            }
                         }
                     }
                 }
+                br;
+                button .software-input
+                    value=(action)
+                    nm-bind="
+                        onclick: () => post('/software', { software: Array.from(software.keys()).join(','), action: this.value }),
+                        disabled: () => nmFetching
+                    "
+                {
+                    span .spinner { (Icon::new("svg-spinners-180-ring")) }
+                    (pretty_action) " "
+                    span nm-bind="textContent: () => Array.from(software.values()).join(', ')" {}
+                }
             }
-            br;
-            button .software-input
-                value=(action)
-                nm-bind="
-                    onclick: () => post('/software', { software: Array.from(software.keys()).join(','), action: this.value }),
-                    disabled: () => nmFetching
-                "
-             {
-                span .spinner { (Icon::new("svg-spinners-180-ring")) }
-                (pretty_action) " "
-                span nm-bind="textContent: () => Array.from(software.values()).join(', ')" {}
+        }
+    }
+}
+
+fn card(data: &SoftwareResponse) -> Markup {
+    html! {
+        section #software-card {
+            h2 { "Software" }
+            .tab-container role="tablist" nm-data="activeIdx: 0" {
+                .tabs {
+                    button nm-bind="
+                        onclick: () => activeIdx = 0,
+                        ariaSelected: () => activeIdx === 0
+                    " { "Install Software" }
+                    button nm-bind="
+                        onclick: () => activeIdx = 1,
+                        ariaSelected: () => activeIdx === 1
+                    " { "Uninstall Software" }
+                }
+                (software_table(&data.uninstalled, 0, "Install", "install"))
+                (software_table(&data.installed, 1, "Uninstall", "uninstall"))
             }
         }
     }
@@ -65,15 +92,7 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
     let data = send_req!(req, Software)?;
 
     let content = html! {
-        section {
-            h2 { "Installed Software" }
-            (software_table(&data.installed, "Uninstall", "uninstall"))
-        }
-        br;
-        section {
-            h2 { "Not Installed Software" }
-            (software_table(&data.uninstalled, "Install", "install"))
-        }
+        (card(&data))
         br;
         #output {}
     };
@@ -118,8 +137,12 @@ pub async fn form(mut req: ServerRequest) -> Result<ServerResponse, ServerRespon
     let resp = send_req!(req, Command(msg))?;
     let output = String::from_utf8_lossy(&resp.output);
 
+    let data = send_req!(req, Software)?;
+
     let content = html! {
-        section #output nm-bind="_: this.scrollIntoView" {
+        (card(&data))
+        br;
+        section #output nm-bind="_: () => this.scrollIntoView()" {
             h2 { "Install Summary" }
             pre {
                 (output)
