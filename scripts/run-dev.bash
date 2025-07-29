@@ -4,7 +4,7 @@
 
 cargo build --bins
 
-./target/debug/server &
+./target/debug/frontend &
 sleep 0.1
 ./target/debug/backend &
 

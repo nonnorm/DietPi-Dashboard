@@ -60,12 +60,12 @@ fn header(req: &ServerRequest) -> Result<Markup, ServerResponse> {
                 }
             }
 
-            button
+            button .msg-btn
                 aria-controls="msgs"
                 nm-bind="onclick: () => msgsOpen = !msgsOpen, ariaExpanded: () => msgsOpen"
             {
                 (Icon::new("fa6-solid-envelope"))
-                span nm-bind="hidden: () => !newMsg" { (Icon::new("svg-spinners-pulse")) }
+                span .notifier nm-bind="hidden: () => !newMsg" { (Icon::new("fa6-solid-circle").size(12)) }
             }
 
             span nm-data="isDark: localStorage.getItem('darkMode') === 'true'" {

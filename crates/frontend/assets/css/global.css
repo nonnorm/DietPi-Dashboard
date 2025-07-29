@@ -71,6 +71,24 @@ header {
     background-color: light-dark(var(--dietpi-light), var(--dietpi-teal-light));
 }
 
+.msg-btn {
+    position: relative;
+
+    .notifier {
+        position: absolute;
+        bottom: -3px;
+        right: -5px;
+
+        color: var(--red-6);
+        animation: scale 2s ease-in-out infinite;
+    }
+}
+
+@keyframes scale {
+    50% { transform: scale(1.5) }
+    100% { transform: scale(1) }
+}
+
 #msgs {
     grid-area: msgs;
 
