@@ -2,7 +2,7 @@ use maud::{Markup, html};
 use pretty_bytes_typed::{pretty_bytes, pretty_bytes_binary};
 use proto::backend::{CpuResponse, DiskResponse, MemResponse, NetworkResponse, TempResponse};
 
-use crate::http::query_array::QueryArray;
+use crate::{http::query_array::QueryArray, pages::template::Icon};
 
 use super::graph::{Axis, SvgGraph};
 
@@ -140,6 +140,16 @@ pub fn mem_graph(
         section .span-3 {
             h2 { "Memory Graph" }
             (graph)
+            .legend {
+                p {
+                    span .ram { (Icon::new("fa6-solid-square").size(16)) }
+                    "RAM"
+                }
+                p {
+                    span .swap { (Icon::new("fa6-solid-square").size(16)) }
+                    "Swap"
+                }
+            }
         }
     }
 }
@@ -189,6 +199,16 @@ pub fn net_graph(
         section .span-3 {
             h2 { "Network Graph" }
             (graph)
+            .legend {
+                p {
+                    span .sent { (Icon::new("fa6-solid-square").size(16)) }
+                    "Bytes Sent"
+                }
+                p {
+                    span .recv { (Icon::new("fa6-solid-square").size(16)) }
+                    "Bytes Received"
+                }
+            }
         }
     }
 }

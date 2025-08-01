@@ -76,7 +76,31 @@
     }
 }
 
-.dummy {
-    --purple: var(--purple-6);
-    --pink: var(--pink-6);
+.legend {
+    display: flex;
+    gap: var(--size-2);
+    justify-content: center;
+
+    p {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: var(--size-1);
+    }
+
+    .swap {
+        color: var(--blue-6);
+    }
+
+    .ram {
+        color: var(--red-6);
+    }
+
+    .sent {
+        color: var(--purple-6);
+    }
+
+    .recv {
+        color: var(--pink-6);
+    }
 }
