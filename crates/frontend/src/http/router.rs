@@ -64,6 +64,8 @@ pub async fn router(req: ServerRequest) -> Result<BuiltResponse, std::convert::I
         (GET, ["browser", "actions", "download"]) => browser::download,
         (POST, ["browser", "actions", "upload"]) => browser::upload,
 
+        (GET, ["config"]) => config::page,
+
         _ => || { ServerResponse::new().status(StatusCode::NOT_FOUND).body("page not found") },
     });
     let resp = resp.build();

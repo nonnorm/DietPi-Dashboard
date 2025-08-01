@@ -27,6 +27,7 @@ pub enum ResponseBackendMessage {
     Services(ServiceResponse),
     Directory(DirectoryResponse),
     Download(Vec<u8>),
+    ReadConfig(String),
 }
 
 #[derive(Debug, Clone, Encode, Decode)]

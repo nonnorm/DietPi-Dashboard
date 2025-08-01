@@ -51,7 +51,7 @@ fn software_table(list: &[SoftwareInfo], idx: u8, pretty_action: &str, action: &
                 button .software-input
                     value=(action)
                     nm-bind="
-                        onclick: () => post('/software', { software: Array.from(software.keys()).join(','), action: this.value }),
+                        onclick: () => post('/software', { software: [...software.keys()].join(','), action: this.value }),
                         disabled: () => nmFetching
                     "
                 {

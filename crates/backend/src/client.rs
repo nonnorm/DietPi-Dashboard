@@ -154,6 +154,7 @@ impl RequestHandler {
                     Services => getters::services,
                     Directory(path) => getters::list_directory,
                     Download(path) => getters::read_file,
+                    ReadConfig => getters::read_config,
                 });
 
                 let resp = BackendMessage::Response(id, resp);

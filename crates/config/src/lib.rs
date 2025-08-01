@@ -24,7 +24,6 @@ macro_rules! generate_config_file {
 pub(crate) use generate_config_file;
 
 #[derive(serde::Deserialize)]
-#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 struct Version {
     #[serde(rename = "CONFIG_VERSION_DO_NOT_CHANGE", default)]
     version: i64,

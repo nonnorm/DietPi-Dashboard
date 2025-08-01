@@ -51,7 +51,7 @@ impl BackendServer {
                 }
             };
 
-            info!("New backend connection from {}", peer_ip);
+            info!("New backend connection from {peer_ip}");
 
             let conn = BackendConnection::new(
                 stream,

@@ -21,6 +21,7 @@ pub enum RequestFrontendMessage {
     Services,
     Directory(String),
     Download(String),
+    ReadConfig,
 }
 
 #[derive(Debug, Encode, Decode)]

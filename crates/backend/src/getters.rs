@@ -383,3 +383,15 @@ pub fn list_directory(_ctx: BackendContext, path: String) -> DirectoryResponse {
 pub fn read_file(_ctx: BackendContext, path: String) -> Vec<u8> {
     fs::read(path).unwrap_or_default()
 }
+
+pub fn read_config_helper() -> Option<String> {
+    let cfgpath = std::env::current_exe()
+        .ok()?
+        .with_file_name("config-backend.toml");
+
+    fs::read_to_string(cfgpath).ok()
+}
+
+pub fn read_config(_ctx: BackendContext) -> String {
+    read_config_helper().unwrap_or_default()
+}
