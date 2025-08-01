@@ -1,4 +1,4 @@
-use hyper::{Method, StatusCode};
+use hyper::{Method, StatusCode, header};
 
 use crate::pages::*;
 
@@ -68,6 +68,14 @@ pub async fn router(req: ServerRequest) -> Result<BuiltResponse, std::convert::I
 
         _ => || { ServerResponse::new().status(StatusCode::NOT_FOUND).body("page not found") },
     });
+
+    let resp = resp
+        .header(header::X_CONTENT_TYPE_OPTIONS, "nosniff")
+        .header(header::X_FRAME_OPTIONS, "sameorigin")
+        .header(header::X_XSS_PROTECTION, "1; mode=block")
+        .header("X-Robots-Tag", "none")
+        .header(header::REFERRER_POLICY, "no-referrer");
+
     let resp = resp.build();
 
     Ok(resp)
