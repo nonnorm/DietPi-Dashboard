@@ -37,7 +37,7 @@
     "@xterm/addon-fit": "^0.10.0",
     "@xterm/xterm": "^5.5.0",
     "microlight": "^0.0.7",
-    "pretty-bytes": "^6.1.0",
+    "pretty-bytes": "^7.0.0",
     "pretty-ms": "^9.0.0",
     "semver-compare-multi": "^1.0.3",
     "uplot": "^1.6.24"
