@@ -216,11 +216,6 @@ pub struct BrowserList {
     pub contents: Vec<BrowserData>,
 }
 
-#[derive(Serialize)]
-pub struct TokenError {
-    pub error: bool,
-}
-
 #[derive(Deserialize, Debug)]
 pub struct FileRequest {
     #[serde(default)]
@@ -234,11 +229,6 @@ pub struct FileRequest {
 #[derive(Serialize)]
 pub struct FileSize {
     pub size: usize,
-}
-
-#[derive(Serialize)]
-pub struct FileUploadFinished {
-    pub finished: bool,
 }
 
 #[derive(Serialize, Deserialize)]
