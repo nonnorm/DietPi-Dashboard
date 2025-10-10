@@ -29,7 +29,7 @@ tracing = { version = "0.1.40", features = ["release_max_level_debug"] }
 tracing-subscriber = "0.3.18"
 hyper = { version = "0.14.28", features = ["server", "http1"] }
 tokio-tungstenite = "0.24.0"
-getrandom = "0.2.14"
+getrandom = "0.3.0"
 hex = "0.4.3"
 vite-embed = { git = "https://github.com/ravenclaw900/vite-embed", version = "0.1.0", features = ["prod"], optional = true }
 mime_guess = { version = "2.0.4", default-features = false }
