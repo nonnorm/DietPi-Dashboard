@@ -11,7 +11,7 @@ fn create_pty() -> Result<Pty> {
     pty.resize(Size::new(24, 80))
         .context("failed to resize pty")?;
 
-    let cmd = Command::new("login");
+    let cmd = Command::new("agetty").args(["-8", "-L", "-", "xterm-256color"]);
     cmd.spawn(pts).context("failed to spawn terminal")?;
 
     Ok(pty)
