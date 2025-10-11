@@ -65,6 +65,13 @@ impl Terminal {
                 }
             }
 
+            // Send escape sequence to clear terminal
+            let _ = self
+                .socket_tx
+                .send(BackendMessage::Action(ActionBackendMessage::Terminal(
+                    b"\x1Bc".to_vec(),
+                )));
+
             if let Ok(pty) = create_pty() {
                 self.pty = pty;
             } else {
