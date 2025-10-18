@@ -48,7 +48,7 @@ impl Default for FrontendConfigV1 {
     fn default() -> Self {
         Self {
             http_port: 5252,
-            backend_port: 5353,
+            backend_port: 5253,
             log_level: LevelFilter::Info,
             enable_tls: false,
             cert_path: PathBuf::new(),

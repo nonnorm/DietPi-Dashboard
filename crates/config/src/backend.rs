@@ -40,7 +40,7 @@ impl Default for BackendConfigV1 {
     fn default() -> Self {
         Self {
             log_level: LevelFilter::Info,
-            frontend_addr: ([127, 0, 0, 1], 5353).into(),
+            frontend_addr: ([127, 0, 0, 1], 5253).into(),
             nickname: String::new(),
             secret: HexArray(rand::random()),
             disks: vec!["/".into()],
