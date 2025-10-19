@@ -29,4 +29,4 @@ serde_urlencoded = "0.7.1"
 simple_logger.workspace = true
 slab = "0.4.9"
 tokio = { workspace = true, features = ["rt", "macros"] }
-tokio-tungstenite = { version = "0.26.2", default-features = false }
+tokio-tungstenite = { version = "0.28.0", default-features = false }
