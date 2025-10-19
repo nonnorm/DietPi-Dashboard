@@ -1,0 +1,84 @@
+code-editor {
+    display: grid;
+
+    > textarea {
+        grid-area: 1 / 1;
+
+        resize: none;
+
+        overflow-y: hidden;
+
+        background-color: transparent;
+        color: transparent;
+        caret-color: light-dark(black, white);
+        border: solid var(--gray-4) var(--border-size-1);
+    }
+
+    > pre {
+        grid-area: 1 / 1;
+
+        pointer-events: none;
+
+        border: solid var(--gray-4) var(--border-size-1);
+    }
+}
+
+#browser-swap {
+    display: grid;
+    grid-template-columns: 1fr var(--size-9);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+        "path    --   "
+        "table actions";
+    gap: var(--size-4);
+}
+
+#browser-inner {
+    grid-area: table;
+    align-self: start;
+}
+
+table#browser-inner tr {
+    user-select: none;
+
+    button {
+        text-align: start;
+
+        width: 100%;
+        height: 100%;
+    }
+
+    &[aria-current="true"] {
+        background-color: light-dark(var(--dietpi-dark), var(--dietpi-teal-dark));
+    }
+}
+
+#path-display {
+    grid-area: path;
+
+    display: flex;
+    align-items: center;
+    gap: var(--size-1);
+
+    padding-inline: var(--size-2);
+
+    background-color: light-dark(var(--gray-4), var(--gray-8));
+
+    button, span {
+        padding: var(--size-1);
+
+        background-color: transparent;
+    }
+}
+
+#actions-list {
+    grid-area: actions;
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-2);
+
+    padding: var(--size-1);
+
+    background-color: light-dark(var(--gray-4), var(--gray-8));
+}

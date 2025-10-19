@@ -1,0 +1,19 @@
+[package]
+name = "config"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[features]
+frontend = []
+backend = []
+
+[dependencies]
+log.workspace = true
+serde.workspace = true
+toml-migrate = { git = "https://github.com/ravenclaw900/toml-migrate" }
+anyhow.workspace = true
+basic-toml = "0.1.10"
+data-encoding = "2.9.0"
+rand = "0.9.1"

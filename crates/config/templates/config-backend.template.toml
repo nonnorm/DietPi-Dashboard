@@ -1,0 +1,19 @@
+# Maximum log level
+# - Options: "off", "error", "warn", "info", "debug"
+# - Default: "info"
+log_level = {log_level}
+
+# Address of frontend node
+# - Format: "ip.addr:port"
+frontend_addr = {frontend_addr}
+# Nickname to be shown on webpage
+nickname = {nickname}
+
+# 64-character secret for encryption
+# Must be the same for both frontend and backend
+secret = {secret}
+
+# Mount point of disks shown on system page
+disks = {disks}
+
+CONFIG_VERSION_DO_NOT_CHANGE = 1

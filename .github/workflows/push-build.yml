@@ -1,12 +1,5 @@
 name: Build
-on:
-  push:
-  workflow_dispatch:
-    inputs:
-      debug_enabled:
-        description: 'Run the build with tmate debugging enabled'
-        required: false
-        default: false
+on: push
 
 jobs:
   fmt_clippy:
@@ -15,68 +8,44 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Setup pnpm
-        run: corepack enable
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+      - name: Build assets
+        run: ./scripts/build-assets.bash
       - name: Lint (rustfmt)
         run: cargo fmt -- --check
       - name: Lint (clippy)
-        run: cargo clippy --all-targets --all-features -- -D warnings
+        run: cargo clippy --all-targets --all-features
 
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         job:
-          - { target: x86_64-unknown-linux-musl, pretty: x86_64, backend: false }
-          - { target: arm-unknown-linux-musleabihf, pretty: armv6l, backend: false }
-          - { target: armv7-unknown-linux-musleabihf, pretty: armv7l, backend: false }
-          - { target: aarch64-unknown-linux-musl, pretty: aarch64, backend: false }
-          - { target: riscv64gc-unknown-linux-gnu, pretty: riscv64, backend: false }
-          - { target: x86_64-unknown-linux-musl, pretty: x86_64-backend, backend: true }
-          - { target: arm-unknown-linux-musleabihf, pretty: armv6l-backend, backend: true }
-          - { target: armv7-unknown-linux-musleabihf, pretty: armv7l-backend, backend: true }
-          - { target: aarch64-unknown-linux-musl, pretty: aarch64-backend, backend: true }
-          - { target: riscv64gc-unknown-linux-gnu, pretty: riscv64-backend, backend: true }
+          - { target: x86_64-unknown-linux-gnu, pretty: x86_64 }
+          - { target: arm-unknown-linux-gnueabihf, pretty: armv6l }
+          - { target: armv7-unknown-linux-gnueabihf, pretty: armv7l }
+          - { target: aarch64-unknown-linux-gnu, pretty: aarch64 }
+          - { target: riscv64gc-unknown-linux-gnu, pretty: riscv64 }
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-        id: toolchain
-        with:
-          targets: ${{ matrix.job.target }}
-          components: clippy, rustfmt
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Enable pnpm
-        run: corepack enable
-      - uses: taiki-e/install-action@v2
-        with:
-          tool: just,cross
       - uses: Swatinem/rust-cache@v2
         with:
           key: ${{ matrix.job.pretty }}-${{ steps.toolchain.outputs.cachekey }}
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
-      - name: Install set-cargo-version
-        run: cargo install set-cargo-version
-      - name: Change frontend version to commit hash
-        working-directory: frontend
-        run: npm version $(git describe --tags) --allow-same-version
-      - name: Change backend version to commit hash
-        run: set-cargo-version Cargo.toml $(git describe --tags | cut -c 2-)
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cross
+      - name: Build assets
+        run: ./scripts/build-assets.bash
       - name: Build DietPi-Dashboard
-        run: |
-          just ci ${{ matrix.job.target }} ${{ matrix.job.backend }}
-      - name: Upload binary
+        run: cross build --release --target ${{ matrix.job.target }}
+      - name: Upload frontend binary
         uses: actions/upload-artifact@v4
         with:
-          name: dietpi-dashboard-${{ matrix.job.pretty }}
-          path: target/${{ matrix.job.target }}/release/dietpi-dashboard
+          name: dietpi-dashboard-${{ matrix.job.pretty }}-frontend
+          path: target/${{ matrix.job.target }}/release/frontend
+      - name: Upload backend binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: dietpi-dashboard-${{ matrix.job.pretty }}-backend
+          path: target/${{ matrix.job.target }}/release/backend

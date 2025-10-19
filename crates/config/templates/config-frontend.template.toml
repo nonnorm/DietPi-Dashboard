@@ -1,0 +1,33 @@
+# TCP port and subnet for webserver
+# - Default: 5252, :: (0.0.0.0)
+http_port = {http_port}
+http_subnet = {http_subnet}
+# TCP port and subnet for backend client connections
+# - Default: 5253, :: (0.0.0.0)
+backend_port = {backend_port}
+backend_subnet = {backend_subnet}
+
+# Maximum log level
+# - Options: "off", "error", "warn", "info", "debug"
+# - Default: "info"
+log_level = {log_level}
+
+# Enable HTTPS mode
+# - Default: false
+enable_tls = {enable_tls}
+# Path to TLS certificate
+cert_path = {cert_path}
+# Path to TLS private key
+key_path = {key_path}
+
+# Enable login
+# - Default: false
+enable_login = {enable_login}
+# SHA512 hash of password
+hash = {hash}
+
+# 64-character secret for encryption
+# Must be the same for both frontend and backend
+secret = {secret}
+
+CONFIG_VERSION_DO_NOT_CHANGE = 1

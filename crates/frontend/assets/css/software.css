@@ -1,0 +1,55 @@
+.tab-container {
+    >.tabs {
+        border-bottom: var(--border-size-1) solid var(--gray-6);
+    }
+
+    >.tabs>button {
+        background-color: light-dark(var(--gray-2), var(--gray-10));
+        border: var(--border-size-1) solid var(--gray-6);
+        border-bottom: none;
+
+        padding: var(--size-1);
+
+        cursor: pointer;
+
+        &[aria-selected="true"] {
+            background-color: var(--gray-6);
+        }
+    }
+}
+
+.software-input {
+    padding: var(--size-2);
+
+    border-radius: var(--radius-md);
+    border: none;
+
+    cursor: pointer;
+
+    &[value="install"] {
+        background-color: var(--green-6);
+    }
+
+    &[value="uninstall"] {
+        background-color: var(--red-6);
+    }
+
+    &:disabled {
+        opacity: 70%;
+    }
+
+    >.spinner {
+        display: none;
+        animation: spin 1s linear infinite;
+    }
+
+    &:disabled>.spinner {
+        display: inline-block;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(1turn)
+    }
+}

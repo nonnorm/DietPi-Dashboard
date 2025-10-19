@@ -1,60 +1,27 @@
-[package]
-name = "dietpi-dashboard"
-version = "0.6.2"
-edition = "2021"
+[workspace]
+members = ["crates/*"]
+resolver = "2"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[workspace.package]
+version = "0.7.0"
+authors = ["ravenclaw900 <ravenclaw900@proton.me>"]
+edition = "2024"
+license = "GPL-3.0"
 
-[dependencies]
-tokio = { version = "1.43.1", features = [
-    "rt",
-    "macros",
-    "time",
-    "sync",
-    "fs",
-    "process",
-] }
-pty-process = { version = "0.4.0", features = ["async"] }
-psutil = "3.3.0"
-ring = "0.17.8"
-figment = { version = "0.10.18", features = ["toml", "env"] }
-if-addrs = "0.13.0"
-zip = { version = "0.6.6", default-features = false, features = ["time"] }
-walkdir = "2.5.0"
-jsonwebtoken = { version = "9.3.0", default-features = false }
-serde = { version = "1.0.200", features = ["derive"] }
-anyhow = "1.0.82"
-serde_json = "1.0.116"
-tracing = { version = "0.1.40", features = ["release_max_level_debug"] }
-tracing-subscriber = "0.3.18"
-hyper = { version = "0.14.28", features = ["server", "http1"] }
-tokio-tungstenite = "0.24.0"
-getrandom = "0.2.14"
-hex = "0.4.3"
-vite-embed = { git = "https://github.com/ravenclaw900/vite-embed", version = "0.1.0", features = ["prod"], optional = true }
-mime_guess = { version = "2.0.4", default-features = false }
-flexible-hyper-server-tls = "0.1.2"
-futures-util = { version = "0.3.30", default-features = false }
+[workspace.dependencies]
+config = { path = "./crates/config" }
+proto = { path = "./crates/proto" }
 
-[features]
-default = ["frontend"]
-frontend = ["dep:vite-embed"]
-dev = ["frontend", "vite-embed?/dev"]
+anyhow = "1.0.93"
+bitcode = "0.6.3"
+log = { version = "0.4.22", features = ["serde"] }
+serde = { version = "1.0.210", features = ["derive"] }
+simple_logger = "5.0.0"
+tokio = "1.40.0"
 
 [profile.release]
-lto = "fat"
 panic = "abort"
 codegen-units = 1
+lto = "fat"
 strip = true
-
-[profile.release.package.serde]
-opt-level = 3
-
-[profile.release.package.psutil]
-opt-level = 3
-
-[profile.release.package.zip]
-opt-level = 3
-
-[profile.release.package."*"]
 opt-level = "s"

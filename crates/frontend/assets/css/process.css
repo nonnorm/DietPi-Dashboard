@@ -1,0 +1,20 @@
+.process-table {
+    th button {
+        width: 100%;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+    }
+
+    .actions-cell {
+        display: flex;
+        gap: var(--size-2);
+
+        width: 100%;
+    }
+}
