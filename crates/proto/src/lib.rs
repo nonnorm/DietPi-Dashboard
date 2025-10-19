@@ -1,6 +1,6 @@
 use futures_util::{SinkExt, StreamExt};
 use ring::aead::{Aad, CHACHA20_POLY1305, LessSafeKey, NONCE_LEN, Nonce, UnboundKey};
-use std::io;
+use std::{fmt::Debug, io};
 use tokio::net::TcpStream;
 use tokio_util::codec::{Framed, LengthDelimitedCodec};
 
@@ -25,7 +25,9 @@ impl DashboardSocket {
         Self { framed, key }
     }
 
-    pub async fn read_frame<F: bitcode::DecodeOwned>(&mut self) -> Result<Option<F>, io::Error> {
+    pub async fn read_frame<F: bitcode::DecodeOwned + Debug>(
+        &mut self,
+    ) -> Result<Option<F>, io::Error> {
         self.framed
             .next()
             .await
@@ -46,7 +48,10 @@ impl DashboardSocket {
             .transpose()
     }
 
-    pub async fn write_frame<F: bitcode::Encode>(&mut self, frame: F) -> Result<(), io::Error> {
+    pub async fn write_frame<F: bitcode::Encode + Debug>(
+        &mut self,
+        frame: F,
+    ) -> Result<(), io::Error> {
         let mut data = bitcode::encode(&frame);
 
         // Random nonces start to become unsafe after about 2^30 messages sent with the same key

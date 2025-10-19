@@ -18,3 +18,4 @@ macro_rules! static_file {
 static_file!(js, "../../dist/main.js", "text/javascript;charset=UTF-8");
 static_file!(css, "../../dist/main.css", "text/css;charset=UTF-8");
 static_file!(icons, "../../dist/icons.svg", "image/svg+xml");
+static_file!(favicon, "../../dist/favicon.svg", "image/svg+xml");

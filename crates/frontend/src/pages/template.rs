@@ -166,6 +166,7 @@ pub fn template(req: &ServerRequest, content: Markup) -> Result<ServerResponse, 
 
                     title { "DietPi Dashboard" }
 
+                    link rel="icon" href="/favicon.svg" type="image/svg+xml";
                     link rel="stylesheet" href="/static/main.css";
                 }
                 body

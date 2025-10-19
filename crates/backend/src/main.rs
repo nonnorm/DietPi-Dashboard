@@ -46,8 +46,13 @@ async fn main() -> Result<()> {
     let (term_tx, term_rx) = mpsc::unbounded_channel();
     let (socket_tx, mut socket_rx) = mpsc::unbounded_channel();
 
-    let terminal = Terminal::new(socket_tx.clone(), term_rx).context("terminal build error")?;
-    tokio::spawn(terminal.run());
+    let terminal = Terminal::new(socket_tx.clone(), term_rx);
+    match terminal {
+        Ok(terminal) => {
+            tokio::spawn(terminal.run());
+        }
+        Err(err) => error!("terminal failed to start: {err:?}"),
+    }
 
     let system = Arc::new(Mutex::new(SystemComponents::new()));
     let context = BackendContext {

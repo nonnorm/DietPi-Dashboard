@@ -31,6 +31,7 @@ pub async fn router(req: ServerRequest) -> Result<BuiltResponse, std::convert::I
         (GET, ["static", "main.css"]) => statics::css,
         (GET, ["static", "main.js"]) => statics::js,
         (GET, ["static", "icons.svg"]) => statics::icons,
+        (GET, ["favicon.svg"]) => statics::favicon,
 
         (GET, []) => async |_| { Ok(ServerResponse::new().redirect(RedirectType::Permanent, "/system")) },
 

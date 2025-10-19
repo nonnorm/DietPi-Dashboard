@@ -21,18 +21,23 @@ css_assets=(
   "$asset_path/css/xterm-5.5.0.css"
 )
 
-svg_src="$asset_path/icons.svg"
+svg_assets=(
+  "$asset_path/icons.svg"
+  "$asset_path/favicon.svg"
+)
 
 js_out="$dist_path/main.js"
 css_out="$dist_path/main.css"
-svg_out="$dist_path/icons.svg"
 
 mkdir -p "$dist_path"
 
 ./scripts/clean-css.bash "${css_assets[@]:1}" > "${css_assets[0]}"
 
-cat "${js_assets[@]}" | gzip -9 > "$js_out"
-cat "${css_assets[@]}" | gzip -9 > "$css_out"
-cat "$svg_src" | gzip -9 > "$svg_out"
+cat "${js_assets[@]}" | gzip -9c > "$js_out"
+cat "${css_assets[@]}" | gzip -9c > "$css_out"
+
+for svg in "${svg_assets[@]}"; do
+  gzip -9c "$svg" > "$dist_path/$(basename "$svg")"
+done
 
 rm "${css_assets[0]}"
