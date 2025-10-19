@@ -1,3 +1,4 @@
+use std::net::{IpAddr, Ipv6Addr};
 use std::path::PathBuf;
 
 use anyhow::Result;
@@ -18,7 +19,9 @@ fn generate_config_file(config: &FrontendConfig) -> String {
     generate_config_file!(
         "config-frontend.template.toml",
         http_port = config.http_port,
+        http_subnet = config.http_subnet,
         backend_port = config.backend_port,
+        backend_subnet = config.backend_subnet,
         log_level = config.log_level,
         enable_tls = config.enable_tls,
         key_path = config.key_path,
@@ -34,7 +37,9 @@ build_migration_chain!(FrontendConfigV0 = 0, FrontendConfigV1 = 1);
 #[derive(Deserialize)]
 pub struct FrontendConfigV1 {
     pub http_port: u16,
+    pub http_subnet: IpAddr,
     pub backend_port: u16,
+    pub backend_subnet: IpAddr,
     pub log_level: LevelFilter,
     pub enable_tls: bool,
     pub cert_path: PathBuf,
@@ -48,7 +53,9 @@ impl Default for FrontendConfigV1 {
     fn default() -> Self {
         Self {
             http_port: 5252,
+            http_subnet: IpAddr::V6(Ipv6Addr::UNSPECIFIED),
             backend_port: 5253,
+            backend_subnet: IpAddr::V6(Ipv6Addr::UNSPECIFIED),
             log_level: LevelFilter::Info,
             enable_tls: false,
             cert_path: PathBuf::new(),
@@ -72,7 +79,9 @@ impl From<FrontendConfigV0> for FrontendConfigV1 {
 
         Self {
             http_port: val.port.unwrap_or(default.http_port),
+            http_subnet: default.http_subnet,
             backend_port: default.backend_port,
+            backend_subnet: default.backend_subnet,
             log_level: val.log_level.unwrap_or(default.log_level),
             enable_tls: val.tls.unwrap_or(default.enable_tls),
             cert_path: val.cert.unwrap_or(default.cert_path),

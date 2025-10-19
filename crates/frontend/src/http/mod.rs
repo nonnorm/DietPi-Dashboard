@@ -34,7 +34,7 @@ impl HttpServer {
     pub async fn new(config: SharedConfig, backends: SharedBackendRegistry) -> Result<Self> {
         info!("Starting web server on port {}", config.http_port);
 
-        let addr = SocketAddr::from((Ipv6Addr::UNSPECIFIED, config.http_port));
+        let addr = SocketAddr::from((config.http_subnet, config.http_port));
         let listener = TcpListener::bind(addr)
             .await
             .context("failed to bind http server")?;

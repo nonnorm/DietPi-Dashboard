@@ -29,7 +29,7 @@ impl BackendServer {
     pub async fn new(config: SharedConfig, registry: SharedBackendRegistry) -> Result<Self> {
         info!("Starting backend server on port {}", config.backend_port);
 
-        let addr = SocketAddr::from((Ipv6Addr::UNSPECIFIED, config.backend_port));
+        let addr = SocketAddr::from((config.backend_subnet, config.backend_port));
         let listener = TcpListener::bind(addr)
             .await
             .context("failed to bind backend tcp server")?;

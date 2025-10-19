@@ -1,9 +1,11 @@
-# TCP port for webserver
-# - Default: 5252
+# TCP port and subnet for webserver
+# - Default: 5252, :: (0.0.0.0)
 http_port = {http_port}
-# TCP port for backend client connections
-# - Default: 5353
+http_subnet = {http_subnet}
+# TCP port and subnet for backend client connections
+# - Default: 5253, :: (0.0.0.0)
 backend_port = {backend_port}
+backend_subnet = {backend_subnet}
 
 # Maximum log level
 # - Options: "off", "error", "warn", "info", "debug"
