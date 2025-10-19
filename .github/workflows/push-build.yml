@@ -21,7 +21,7 @@ jobs:
       matrix:
         job:
           - { target: x86_64-unknown-linux-gnu, pretty: x86_64 }
-          - { target: arm-unknown-linux-gnueabihf, pretty: armv6l }
+          - { target: arm-unknown-linux-gnueabihf -C target-cpu=arm1176jzf-s, pretty: armv6l }
           - { target: armv7-unknown-linux-gnueabihf, pretty: armv7l }
           - { target: aarch64-unknown-linux-gnu, pretty: aarch64 }
           - { target: riscv64gc-unknown-linux-gnu, pretty: riscv64 }
