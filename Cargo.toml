@@ -23,5 +23,5 @@ tokio = "1.40.0"
 panic = "abort"
 codegen-units = 1
 lto = "fat"
-strip = true
+debug = "line-tables-only"
 opt-level = "s"
