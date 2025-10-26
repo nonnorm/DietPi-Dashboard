@@ -41,22 +41,22 @@
         background-size: calc(100% / var(--scale));
     }
 
-    >.bar.-cpu {
+    >.bar.cpu {
         --start: var(--green-6);
         --end: var(--green-10);
     }
 
-    >.bar.-ram {
+    >.bar.ram {
         --start: light-dark(var(--red-6), var(--red-8));
         --end: var(--red-10);
     }
 
-    >.bar.-swap {
+    >.bar.swap {
         --start: light-dark(var(--blue-6), var(--blue-8));
         --end: var(--blue-10);
     }
 
-    >.bar.-disk {
+    >.bar.disk {
         --start: var(--yellow-6);
         --end: var(--yellow-10);
     }
