@@ -40,12 +40,12 @@ jobs:
       - name: Build DietPi-Dashboard
         run: cross build --release --target ${{ matrix.job.target }}
       - name: Upload frontend binary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: dietpi-dashboard-${{ matrix.job.pretty }}-frontend
           path: target/${{ matrix.job.target }}/release/frontend
       - name: Upload backend binary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: dietpi-dashboard-${{ matrix.job.pretty }}-backend
           path: target/${{ matrix.job.target }}/release/backend
