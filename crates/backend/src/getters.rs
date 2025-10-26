@@ -37,7 +37,7 @@ pub fn cpu(mut ctx: BackendContext) -> CpuResponse {
 
 pub fn temp(mut ctx: BackendContext) -> TempResponse {
     let components = &mut ctx.system().components;
-    components.refresh();
+    components.refresh(false);
     let components = components.list();
 
     let known_sensor_names = ["coretemp Package", "tdie"];
@@ -46,7 +46,8 @@ pub fn temp(mut ctx: BackendContext) -> TempResponse {
         .iter()
         .find(|x| known_sensor_names.iter().any(|y| x.label().contains(y)))
         .or_else(|| components.first())
-        .map(|x| round_to_2(x.temperature()));
+        .and_then(|x| x.temperature())
+        .map(round_to_2);
 
     TempResponse { temp }
 }
@@ -75,7 +76,7 @@ pub fn disks(mut ctx: BackendContext) -> DiskResponse {
     let mnt_points: Vec<_> = mnt_points.iter().map(PathBuf::from).collect();
 
     let disks = &mut ctx.system().disks;
-    disks.refresh();
+    disks.refresh(false);
     let disks = disks.list();
 
     let disks: Vec<_> = disks
@@ -96,7 +97,7 @@ pub fn disks(mut ctx: BackendContext) -> DiskResponse {
 
 pub fn network_io(mut ctx: BackendContext) -> NetworkResponse {
     let networks = &mut ctx.system().networks;
-    networks.refresh();
+    networks.refresh(false);
     let networks = networks.list();
 
     let mut resp = NetworkResponse { sent: 0, recv: 0 };
@@ -115,7 +116,7 @@ pub fn processes(mut ctx: BackendContext) -> ProcessResponse {
     sys.refresh_processes_specifics(
         ProcessesToUpdate::All,
         true,
-        ProcessRefreshKind::new()
+        ProcessRefreshKind::nothing()
             .with_cpu()
             .with_memory()
             .with_cmd(UpdateKind::OnlyIfNotSet),
@@ -155,7 +156,10 @@ pub fn host(mut ctx: BackendContext) -> HostResponse {
         .unwrap_or_else(unknown);
 
     let uptime = System::uptime();
-    let arch = System::cpu_arch().unwrap_or_else(unknown);
+    let arch = {
+        let a = System::cpu_arch();
+        if a.is_empty() { unknown() } else { a }
+    };
     let os_version = System::long_os_version().unwrap_or_else(unknown);
     let kernel = System::kernel_version().unwrap_or_else(unknown);
     let hostname = System::host_name().unwrap_or_else(unknown);
