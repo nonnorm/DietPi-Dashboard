@@ -35,12 +35,12 @@ pub fn cpu_meters(cpu_data: &CpuResponse, temp_data: &TempResponse) -> Markup {
             }
             p { "Global CPU: " (cpu_data.global_cpu) "%" }
             .meter-container {
-                .bar.-cpu style={"--scale:"(cpu_data.global_cpu / 100.)} {}
+                .bar.cpu style={"--scale:"(cpu_data.global_cpu / 100.)} {}
             }
             @for (usage, num) in cpu_iter {
                 p { "CPU "(num)": "(usage)"%" }
                 .meter-container {
-                    .bar.-cpu style={"--scale:"(usage / 100.)} {}
+                    .bar.cpu style={"--scale:"(usage / 100.)} {}
                 }
             }
         }
@@ -102,12 +102,12 @@ pub fn mem_meters(data: &MemResponse) -> Markup {
 
             p { "RAM Usage: " (pretty_ram_used) " / " (pretty_ram_total) }
             div .meter-container {
-                div .bar.-ram style={"--scale:"(ram_percent / 100.)} {}
+                div .bar.ram style={"--scale:"(ram_percent / 100.)} {}
             }
 
             p { "Swap Usage: " (pretty_swap_used) " / " (pretty_swap_total) }
             div .meter-container {
-                div .bar.-swap style={"--scale:"(swap_percent / 100.)} {}
+                div .bar.swap style={"--scale:"(swap_percent / 100.)} {}
             }
         }
     }
@@ -168,7 +168,7 @@ pub fn disk_meters(data: &DiskResponse) -> Markup {
 
                 p { (disk.name) " (" (disk.mnt_point) "): " (pretty_disk_used) " / " (pretty_disk_total) }
                 .meter-container {
-                    .bar.-disk style={"--scale:"(disk_percent / 100.)} {}
+                    .bar.disk style={"--scale:"(disk_percent / 100.)} {}
                 }
             }
         }
