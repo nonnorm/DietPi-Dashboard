@@ -1,6 +1,6 @@
 use std::{
     collections::HashMap,
-    net::{IpAddr, Ipv6Addr, SocketAddr},
+    net::{IpAddr, SocketAddr},
     sync::{Arc, Mutex},
 };
 

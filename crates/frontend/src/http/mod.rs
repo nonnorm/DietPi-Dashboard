@@ -1,4 +1,4 @@
-use std::net::{Ipv6Addr, SocketAddr};
+use std::net::SocketAddr;
 
 use anyhow::{Context, Result};
 use auth::SharedLoginMap;
