@@ -1,5 +1,5 @@
 [build]
-rustflags = ["-Clink-arg=-Wl,--compress-debug-sections=zlib"]
+rustflags = ["-Clink-arg=-Wl,--compress-debug-sections=zstd"]
 
 [target.arm-unknown-linux-gnueabihf]
 rustflags = ["-C", "target-cpu=arm1176jzf-s"]
