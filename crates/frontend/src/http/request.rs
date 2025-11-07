@@ -94,9 +94,11 @@ impl ServerRequest {
             .collect();
 
         if backend_list.is_empty() {
-            return Err(Box::new(ServerResponse::new()
-                .status(StatusCode::SERVICE_UNAVAILABLE)
-                .body("no connected backends")));
+            return Err(Box::new(
+                ServerResponse::new()
+                    .status(StatusCode::SERVICE_UNAVAILABLE)
+                    .body("no connected backends"),
+            ));
         }
 
         let current_backend = {
@@ -130,22 +132,23 @@ impl ServerRequest {
         let backend_handle = self.extract_backends()?.current_backend.handle;
 
         backend_handle.send_req(req).await.map_err(|err| {
-            Box::new(ServerResponse::new()
-                .status(StatusCode::BAD_GATEWAY)
-                .body(format!("backend request failed: {err}")))
+            Box::new(
+                ServerResponse::new()
+                    .status(StatusCode::BAD_GATEWAY)
+                    .body(format!("backend request failed: {err}")),
+            )
         })
     }
 
-    pub async fn send_backend_action(
-        &self,
-        msg: ActionFrontendMessage,
-    ) -> ServerResult<()> {
+    pub async fn send_backend_action(&self, msg: ActionFrontendMessage) -> ServerResult<()> {
         let backend_handle = self.extract_backends()?.current_backend.handle;
 
         backend_handle.send_action(msg).await.map_err(|err| {
-            Box::new(ServerResponse::new()
-                .status(StatusCode::BAD_GATEWAY)
-                .body(format!("backend action failed: {err}")))
+            Box::new(
+                ServerResponse::new()
+                    .status(StatusCode::BAD_GATEWAY)
+                    .body(format!("backend action failed: {err}")),
+            )
         })
     }
 
@@ -153,31 +156,37 @@ impl ServerRequest {
         let query = self.uri.query().unwrap_or_default();
 
         serde_urlencoded::from_str(query).map_err(|err| {
-            Box::new(ServerResponse::new()
-                .status(StatusCode::BAD_REQUEST)
-                .body(format!("invalid query params: {err}")))
+            Box::new(
+                ServerResponse::new()
+                    .status(StatusCode::BAD_REQUEST)
+                    .body(format!("invalid query params: {err}")),
+            )
         })
     }
 
-    pub async fn extract_form<T: serde::de::DeserializeOwned>(
-        &mut self,
-    ) -> ServerResult<T> {
+    pub async fn extract_form<T: serde::de::DeserializeOwned>(&mut self) -> ServerResult<T> {
         let Some(body) = self.body.take() else {
-            return Err(Box::new(ServerResponse::new()
-                .status(StatusCode::INTERNAL_SERVER_ERROR)
-                .body("form already extracted")));
+            return Err(Box::new(
+                ServerResponse::new()
+                    .status(StatusCode::INTERNAL_SERVER_ERROR)
+                    .body("form already extracted"),
+            ));
         };
 
         let body = body.collect().await.map_err(|_| {
-            Box::new(ServerResponse::new()
-                .status(StatusCode::BAD_REQUEST)
-                .body("needs body"))
+            Box::new(
+                ServerResponse::new()
+                    .status(StatusCode::BAD_REQUEST)
+                    .body("needs body"),
+            )
         })?;
 
         serde_urlencoded::from_bytes(&body.to_bytes()).map_err(|_| {
-            Box::new(ServerResponse::new()
-                .status(StatusCode::BAD_REQUEST)
-                .body("invalid form body"))
+            Box::new(
+                ServerResponse::new()
+                    .status(StatusCode::BAD_REQUEST)
+                    .body("invalid form body"),
+            )
         })
     }
 
@@ -205,9 +214,11 @@ impl ServerRequest {
             && self.headers.contains_key(header::SEC_WEBSOCKET_KEY);
 
         if !is_websocket_req {
-            return Err(Box::new(ServerResponse::new()
-                .status(StatusCode::BAD_REQUEST)
-                .body("expected websocket upgrade")));
+            return Err(Box::new(
+                ServerResponse::new()
+                    .status(StatusCode::BAD_REQUEST)
+                    .body("expected websocket upgrade"),
+            ));
         }
 
         let sec_key = self
@@ -244,10 +255,13 @@ impl ServerRequest {
     pub fn check_login(&self) -> ServerResult<()> {
         if self.config().enable_login {
             let err_resp = if self.is_fixi() {
-                Err(Box::new(ServerResponse::new()
-                    .body(r#"<meta http-equiv="refresh" content="0; url=/login" />"#)))
+                Err(Box::new(ServerResponse::new().body(
+                    r#"<meta http-equiv="refresh" content="0; url=/login" />"#,
+                )))
             } else {
-                Err(Box::new(ServerResponse::new().redirect(RedirectType::SeeOther, "/login")))
+                Err(Box::new(
+                    ServerResponse::new().redirect(RedirectType::SeeOther, "/login"),
+                ))
             };
 
             let Some(token) = self.cookies.get("token") else {

@@ -82,7 +82,9 @@ pub fn disks(mut ctx: BackendContext) -> DiskResponse {
         .iter()
         .filter(|disk| {
             let mount_point_str = disk.mount_point().to_str().unwrap_or("");
-            mnt_points.iter().any(|path| path.as_str() == mount_point_str)
+            mnt_points
+                .iter()
+                .any(|path| path.as_str() == mount_point_str)
         })
         .map(|disk| DiskInfo {
             name: disk.name().to_str().unwrap_or("unknown").into(),

@@ -2,7 +2,10 @@ use std::time::Duration;
 
 use maud::html;
 
-use crate::http::{request::ServerRequest, response::{ServerResponse, ServerResult}};
+use crate::http::{
+    request::ServerRequest,
+    response::{ServerResponse, ServerResult},
+};
 
 use super::template::{send_req, template};
 

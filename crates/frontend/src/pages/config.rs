@@ -2,22 +2,29 @@ use hyper::StatusCode;
 use maud::html;
 use tokio::fs;
 
-use crate::http::{request::ServerRequest, response::{ServerResponse, ServerResult}};
+use crate::http::{
+    request::ServerRequest,
+    response::{ServerResponse, ServerResult},
+};
 
 use super::template::{send_req, template};
 
 async fn read_config() -> ServerResult<String> {
     let mut cfgpath = std::env::current_exe().map_err(|_| {
-        Box::new(ServerResponse::new()
-            .body("failed to get config path")
-            .status(StatusCode::INTERNAL_SERVER_ERROR))
+        Box::new(
+            ServerResponse::new()
+                .body("failed to get config path")
+                .status(StatusCode::INTERNAL_SERVER_ERROR),
+        )
     })?;
     cfgpath.set_file_name("config-frontend.toml");
 
     fs::read_to_string(cfgpath).await.map_err(|_| {
-        Box::new(ServerResponse::new()
-            .body("failed to read config")
-            .status(StatusCode::INTERNAL_SERVER_ERROR))
+        Box::new(
+            ServerResponse::new()
+                .body("failed to read config")
+                .status(StatusCode::INTERNAL_SERVER_ERROR),
+        )
     })
 }
 

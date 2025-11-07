@@ -4,7 +4,10 @@ use futures_util::{SinkExt, StreamExt};
 use proto::frontend::ActionFrontendMessage;
 use tokio_tungstenite::tungstenite::Message;
 
-use crate::http::{request::ServerRequest, response::{ServerResponse, ServerResult}};
+use crate::http::{
+    request::ServerRequest,
+    response::{ServerResponse, ServerResult},
+};
 
 use super::template::template;
 

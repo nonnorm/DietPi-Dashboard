@@ -3,7 +3,10 @@ use pretty_bytes_typed::pretty_bytes_binary;
 use proto::{backend::ProcessStatus, frontend::SignalAction};
 use serde::{Deserialize, Serialize};
 
-use crate::http::{request::ServerRequest, response::{ServerResponse, ServerResult}};
+use crate::http::{
+    request::ServerRequest,
+    response::{ServerResponse, ServerResult},
+};
 
 use super::template::{Icon, send_act, send_req, template};
 

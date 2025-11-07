@@ -1,7 +1,11 @@
 use maud::html;
 use serde::{Deserialize, Serialize};
 
-use crate::http::{query_array::QueryArray, request::ServerRequest, response::{ServerResponse, ServerResult}};
+use crate::http::{
+    query_array::QueryArray,
+    request::ServerRequest,
+    response::{ServerResponse, ServerResult},
+};
 
 use super::template::{send_req, template};
 

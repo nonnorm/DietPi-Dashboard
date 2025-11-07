@@ -6,7 +6,11 @@ use proto::{
 use serde::Deserialize;
 
 use crate::{
-    http::{query_array::QueryArray, request::ServerRequest, response::{ServerResponse, ServerResult}},
+    http::{
+        query_array::QueryArray,
+        request::ServerRequest,
+        response::{ServerResponse, ServerResult},
+    },
     pages::template::Icon,
 };
 

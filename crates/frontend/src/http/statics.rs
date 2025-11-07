@@ -1,6 +1,9 @@
 use hyper::header;
 
-use super::{request::ServerRequest, response::{ServerResponse, ServerResult}};
+use super::{
+    request::ServerRequest,
+    response::{ServerResponse, ServerResult},
+};
 
 macro_rules! static_file {
     ($name:ident, $path:literal, $mime:literal) => {

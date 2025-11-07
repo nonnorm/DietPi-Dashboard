@@ -12,7 +12,9 @@ use super::template::template;
 
 pub async fn page(req: ServerRequest) -> ServerResult<ServerResponse> {
     if !req.config().enable_login {
-        return Err(Box::new(ServerResponse::new().redirect(RedirectType::SeeOther, "/")));
+        return Err(Box::new(
+            ServerResponse::new().redirect(RedirectType::SeeOther, "/"),
+        ));
     }
 
     let content = html! {
@@ -37,7 +39,9 @@ pub struct LoginForm {
 
 pub async fn form(mut req: ServerRequest) -> ServerResult<ServerResponse> {
     if !req.config().enable_login {
-        return Err(Box::new(ServerResponse::new().redirect(RedirectType::SeeOther, "/")));
+        return Err(Box::new(
+            ServerResponse::new().redirect(RedirectType::SeeOther, "/"),
+        ));
     }
 
     let hash = req.config().hash.clone();
@@ -59,6 +63,8 @@ pub async fn form(mut req: ServerRequest) -> ServerResult<ServerResponse> {
                 format!("token={token}; Max-Age=3600; Path=/; HttpOnly"),
             ))
     } else {
-        Err(Box::new(ServerResponse::new().redirect(RedirectType::SeeOther, "/login")))
+        Err(Box::new(
+            ServerResponse::new().redirect(RedirectType::SeeOther, "/login"),
+        ))
     }
 }
