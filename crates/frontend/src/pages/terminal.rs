@@ -4,14 +4,11 @@ use futures_util::{SinkExt, StreamExt};
 use proto::frontend::ActionFrontendMessage;
 use tokio_tungstenite::tungstenite::Message;
 
-use crate::http::{
-    request::ServerRequest,
-    response::{ServerResponse, ServerResult},
-};
+use crate::http::{request::ServerRequest, response::ServerResponse};
 
 use super::template::template;
 
-pub async fn page(req: ServerRequest) -> ServerResult<ServerResponse> {
+pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
     req.check_login()?;
 
     let content = html! {
@@ -24,7 +21,7 @@ pub async fn page(req: ServerRequest) -> ServerResult<ServerResponse> {
     template(&req, content)
 }
 
-pub async fn socket(req: ServerRequest) -> ServerResult<ServerResponse> {
+pub async fn socket(req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
     req.check_login()?;
 
     let backend = req.extract_backends()?.current_backend.handle;

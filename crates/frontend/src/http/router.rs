@@ -2,7 +2,7 @@ use hyper::{Method, StatusCode, header};
 
 use crate::pages::*;
 
-use super::response::{BuiltResponse, RedirectType, ServerResponse, ServerResult};
+use super::response::{BuiltResponse, RedirectType, ServerResponse};
 use super::{request::ServerRequest, statics};
 
 const GET: &Method = &Method::GET;
@@ -15,12 +15,8 @@ macro_rules! router {
     }) => {{
         match (&$req.method, $path) {
             $(
-                ($method, $paths) => {
-                    let result = $handler($req).await;
-                    match result {
-                        Ok(resp) => resp,
-                        Err(boxed_resp) => *boxed_resp,
-                    }
+                ($method, $paths) => match $handler($req).await {
+                    Ok(resp) | Err(resp) => resp
                 },
             )*
             _ => $fallback()
@@ -37,7 +33,7 @@ pub async fn router(req: ServerRequest) -> Result<BuiltResponse, std::convert::I
         (GET, ["static", "icons.svg"]) => statics::icons,
         (GET, ["favicon.svg"]) => statics::favicon,
 
-        (GET, []) => async |_| -> ServerResult<ServerResponse> { Ok(ServerResponse::new().redirect(RedirectType::Permanent, "/system")) },
+        (GET, []) => async |_| { Ok(ServerResponse::new().redirect(RedirectType::Permanent, "/system")) },
 
         (GET, ["login"]) => login::page,
         (POST, ["login"]) => login::form,

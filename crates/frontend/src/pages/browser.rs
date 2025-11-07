@@ -13,7 +13,7 @@ use serde::Deserialize;
 use crate::{
     http::{
         request::ServerRequest,
-        response::{RedirectType, ServerResponse, ServerResult},
+        response::{RedirectType, ServerResponse},
     },
     pages::template::{Icon, send_act},
 };
@@ -30,7 +30,7 @@ pub struct BrowserQuery {
     path: String,
 }
 
-pub async fn page(req: ServerRequest) -> ServerResult<ServerResponse> {
+pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
     req.check_login()?;
 
     let query: BrowserQuery = req.extract_query()?;
@@ -99,7 +99,7 @@ pub async fn page(req: ServerRequest) -> ServerResult<ServerResponse> {
     template(&req, content)
 }
 
-pub async fn file(req: ServerRequest) -> ServerResult<ServerResponse> {
+pub async fn file(req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
     req.check_login()?;
 
     let query: BrowserQuery = req.extract_query()?;
@@ -166,7 +166,7 @@ pub struct BrowserActionsQuery {
     kind: FileKind,
 }
 
-pub async fn actions(req: ServerRequest) -> ServerResult<ServerResponse> {
+pub async fn actions(req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
     req.check_login()?;
 
     let query: BrowserActionsQuery = req.extract_query()?;
@@ -269,7 +269,7 @@ pub struct NewQuery {
     name: String,
 }
 
-pub async fn new_file(mut req: ServerRequest) -> ServerResult<ServerResponse> {
+pub async fn new_file(mut req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
     req.check_login()?;
 
     let query: NewQuery = req.extract_form().await?;
@@ -286,7 +286,7 @@ pub async fn new_file(mut req: ServerRequest) -> ServerResult<ServerResponse> {
     ))
 }
 
-pub async fn new_folder(mut req: ServerRequest) -> ServerResult<ServerResponse> {
+pub async fn new_folder(mut req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
     req.check_login()?;
 
     let query: NewQuery = req.extract_form().await?;
@@ -309,7 +309,7 @@ pub struct RenameQuery {
     new_name: String,
 }
 
-pub async fn rename(mut req: ServerRequest) -> ServerResult<ServerResponse> {
+pub async fn rename(mut req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
     req.check_login()?;
 
     let query: RenameQuery = req.extract_form().await?;
@@ -339,7 +339,7 @@ pub struct FileQuery {
     path: String,
 }
 
-pub async fn delete_file(mut req: ServerRequest) -> ServerResult<ServerResponse> {
+pub async fn delete_file(mut req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
     req.check_login()?;
 
     let query: FileQuery = req.extract_form().await?;
@@ -356,7 +356,7 @@ pub async fn delete_file(mut req: ServerRequest) -> ServerResult<ServerResponse>
     Ok(ServerResponse::new().redirect(RedirectType::SeeOther, &format!("/browser?path={parent}")))
 }
 
-pub async fn delete_folder(mut req: ServerRequest) -> ServerResult<ServerResponse> {
+pub async fn delete_folder(mut req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
     req.check_login()?;
 
     let query: FileQuery = req.extract_form().await?;
@@ -373,7 +373,7 @@ pub async fn delete_folder(mut req: ServerRequest) -> ServerResult<ServerRespons
     Ok(ServerResponse::new().redirect(RedirectType::SeeOther, &format!("/browser?path={parent}")))
 }
 
-pub async fn download(req: ServerRequest) -> ServerResult<ServerResponse> {
+pub async fn download(req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
     req.check_login()?;
 
     let query: FileQuery = req.extract_query()?;
@@ -389,7 +389,7 @@ pub struct SaveForm {
     data: String,
 }
 
-pub async fn save(mut req: ServerRequest) -> ServerResult<ServerResponse> {
+pub async fn save(mut req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
     req.check_login()?;
 
     let query: SaveForm = req.extract_form().await?;
@@ -410,7 +410,7 @@ pub struct UploadForm {
     data: String,
 }
 
-pub async fn upload(mut req: ServerRequest) -> ServerResult<ServerResponse> {
+pub async fn upload(mut req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
     req.check_login()?;
 
     let query: UploadForm = req.extract_form().await?;

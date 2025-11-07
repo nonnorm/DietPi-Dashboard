@@ -5,16 +5,14 @@ use serde::Deserialize;
 
 use crate::http::{
     request::ServerRequest,
-    response::{RedirectType, ServerResponse, ServerResult},
+    response::{RedirectType, ServerResponse},
 };
 
 use super::template::template;
 
-pub async fn page(req: ServerRequest) -> ServerResult<ServerResponse> {
+pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
     if !req.config().enable_login {
-        return Err(Box::new(
-            ServerResponse::new().redirect(RedirectType::SeeOther, "/"),
-        ));
+        return Err(ServerResponse::new().redirect(RedirectType::SeeOther, "/"));
     }
 
     let content = html! {
@@ -37,11 +35,9 @@ pub struct LoginForm {
     pass: String,
 }
 
-pub async fn form(mut req: ServerRequest) -> ServerResult<ServerResponse> {
+pub async fn form(mut req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
     if !req.config().enable_login {
-        return Err(Box::new(
-            ServerResponse::new().redirect(RedirectType::SeeOther, "/"),
-        ));
+        return Err(ServerResponse::new().redirect(RedirectType::SeeOther, "/"));
     }
 
     let hash = req.config().hash.clone();
@@ -63,8 +59,6 @@ pub async fn form(mut req: ServerRequest) -> ServerResult<ServerResponse> {
                 format!("token={token}; Max-Age=3600; Path=/; HttpOnly"),
             ))
     } else {
-        Err(Box::new(
-            ServerResponse::new().redirect(RedirectType::SeeOther, "/login"),
-        ))
+        Err(ServerResponse::new().redirect(RedirectType::SeeOther, "/login"))
     }
 }

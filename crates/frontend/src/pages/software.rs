@@ -6,11 +6,7 @@ use proto::{
 use serde::Deserialize;
 
 use crate::{
-    http::{
-        query_array::QueryArray,
-        request::ServerRequest,
-        response::{ServerResponse, ServerResult},
-    },
+    http::{query_array::QueryArray, request::ServerRequest, response::ServerResponse},
     pages::template::Icon,
 };
 
@@ -90,7 +86,7 @@ fn card(data: &SoftwareResponse) -> Markup {
     }
 }
 
-pub async fn page(req: ServerRequest) -> ServerResult<ServerResponse> {
+pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
     req.check_login()?;
 
     let data = send_req!(req, Software)?;
@@ -117,7 +113,7 @@ struct SoftwareForm {
     action: SoftwareAction,
 }
 
-pub async fn form(mut req: ServerRequest) -> ServerResult<ServerResponse> {
+pub async fn form(mut req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
     req.check_login()?;
 
     let form: SoftwareForm = req.extract_form().await?;

@@ -3,7 +3,7 @@ use maud::{DOCTYPE, Markup, Render, html};
 
 use crate::http::{
     request::{BackendData, ServerRequest},
-    response::{ServerResponse, ServerResult},
+    response::ServerResponse,
 };
 
 macro_rules! send_req {
@@ -31,7 +31,7 @@ macro_rules! send_act {
 
 pub(crate) use send_act;
 
-fn header(req: &ServerRequest) -> ServerResult<Markup> {
+fn header(req: &ServerRequest) -> Result<Markup, ServerResponse> {
     let BackendData {
         backend_list,
         current_backend,
@@ -153,7 +153,7 @@ fn footer() -> Markup {
     }
 }
 
-pub fn template(req: &ServerRequest, content: Markup) -> ServerResult<ServerResponse> {
+pub fn template(req: &ServerRequest, content: Markup) -> Result<ServerResponse, ServerResponse> {
     let page = if req.is_fixi() {
         content
     } else {

@@ -27,7 +27,7 @@ use crate::backend::BackendHandle;
 use super::{
     FrontendContext,
     auth::SharedLoginMap,
-    response::{RedirectType, ServerResponse, ServerResult},
+    response::{RedirectType, ServerResponse},
 };
 
 pub type HyperRequest = hyper::Request<Incoming>;
@@ -86,7 +86,7 @@ impl ServerRequest {
         &self.context.config
     }
 
-    pub fn extract_backends(&self) -> ServerResult<BackendData> {
+    pub fn extract_backends(&self) -> Result<BackendData, ServerResponse> {
         let backends = self.context.backends.lock().unwrap();
         let backend_list: Vec<_> = backends
             .iter()
@@ -94,11 +94,9 @@ impl ServerRequest {
             .collect();
 
         if backend_list.is_empty() {
-            return Err(Box::new(
-                ServerResponse::new()
-                    .status(StatusCode::SERVICE_UNAVAILABLE)
-                    .body("no connected backends"),
-            ));
+            return Err(ServerResponse::new()
+                .status(StatusCode::SERVICE_UNAVAILABLE)
+                .body("no connected backends"));
         }
 
         let current_backend = {
@@ -128,65 +126,58 @@ impl ServerRequest {
     pub async fn send_backend_req(
         &self,
         req: RequestFrontendMessage,
-    ) -> ServerResult<ResponseBackendMessage> {
+    ) -> Result<ResponseBackendMessage, ServerResponse> {
         let backend_handle = self.extract_backends()?.current_backend.handle;
 
         backend_handle.send_req(req).await.map_err(|err| {
-            Box::new(
-                ServerResponse::new()
-                    .status(StatusCode::BAD_GATEWAY)
-                    .body(format!("backend request failed: {err}")),
-            )
+            ServerResponse::new()
+                .status(StatusCode::BAD_GATEWAY)
+                .body(format!("backend request failed: {err}"))
         })
     }
 
-    pub async fn send_backend_action(&self, msg: ActionFrontendMessage) -> ServerResult<()> {
+    pub async fn send_backend_action(
+        &self,
+        msg: ActionFrontendMessage,
+    ) -> Result<(), ServerResponse> {
         let backend_handle = self.extract_backends()?.current_backend.handle;
 
         backend_handle.send_action(msg).await.map_err(|err| {
-            Box::new(
-                ServerResponse::new()
-                    .status(StatusCode::BAD_GATEWAY)
-                    .body(format!("backend action failed: {err}")),
-            )
+            ServerResponse::new()
+                .status(StatusCode::BAD_GATEWAY)
+                .body(format!("backend action failed: {err}"))
         })
     }
 
-    pub fn extract_query<Qu: serde::de::DeserializeOwned>(&self) -> ServerResult<Qu> {
+    pub fn extract_query<Qu: serde::de::DeserializeOwned>(&self) -> Result<Qu, ServerResponse> {
         let query = self.uri.query().unwrap_or_default();
 
         serde_urlencoded::from_str(query).map_err(|err| {
-            Box::new(
-                ServerResponse::new()
-                    .status(StatusCode::BAD_REQUEST)
-                    .body(format!("invalid query params: {err}")),
-            )
+            ServerResponse::new()
+                .status(StatusCode::BAD_REQUEST)
+                .body(format!("invalid query params: {err}"))
         })
     }
 
-    pub async fn extract_form<T: serde::de::DeserializeOwned>(&mut self) -> ServerResult<T> {
+    pub async fn extract_form<T: serde::de::DeserializeOwned>(
+        &mut self,
+    ) -> Result<T, ServerResponse> {
         let Some(body) = self.body.take() else {
-            return Err(Box::new(
-                ServerResponse::new()
-                    .status(StatusCode::INTERNAL_SERVER_ERROR)
-                    .body("form already extracted"),
-            ));
+            return Err(ServerResponse::new()
+                .status(StatusCode::INTERNAL_SERVER_ERROR)
+                .body("form already extracted"));
         };
 
         let body = body.collect().await.map_err(|_| {
-            Box::new(
-                ServerResponse::new()
-                    .status(StatusCode::BAD_REQUEST)
-                    .body("needs body"),
-            )
+            ServerResponse::new()
+                .status(StatusCode::BAD_REQUEST)
+                .body("needs body")
         })?;
 
         serde_urlencoded::from_bytes(&body.to_bytes()).map_err(|_| {
-            Box::new(
-                ServerResponse::new()
-                    .status(StatusCode::BAD_REQUEST)
-                    .body("invalid form body"),
-            )
+            ServerResponse::new()
+                .status(StatusCode::BAD_REQUEST)
+                .body("invalid form body")
         })
     }
 
@@ -194,7 +185,7 @@ impl ServerRequest {
         self.headers.contains_key("nm-request")
     }
 
-    pub fn extract_websocket<F, Fut>(self, handler_fn: F) -> ServerResult<ServerResponse>
+    pub fn extract_websocket<F, Fut>(self, handler_fn: F) -> Result<ServerResponse, ServerResponse>
     where
         F: FnOnce(WebSocketStream<TokioIo<Upgraded>>) -> Fut + Send + 'static,
         Fut: Future + Send,
@@ -214,11 +205,9 @@ impl ServerRequest {
             && self.headers.contains_key(header::SEC_WEBSOCKET_KEY);
 
         if !is_websocket_req {
-            return Err(Box::new(
-                ServerResponse::new()
-                    .status(StatusCode::BAD_REQUEST)
-                    .body("expected websocket upgrade"),
-            ));
+            return Err(ServerResponse::new()
+                .status(StatusCode::BAD_REQUEST)
+                .body("expected websocket upgrade"));
         }
 
         let sec_key = self
@@ -252,16 +241,13 @@ impl ServerRequest {
         Ok(resp)
     }
 
-    pub fn check_login(&self) -> ServerResult<()> {
+    pub fn check_login(&self) -> Result<(), ServerResponse> {
         if self.config().enable_login {
             let err_resp = if self.is_fixi() {
-                Err(Box::new(ServerResponse::new().body(
-                    r#"<meta http-equiv="refresh" content="0; url=/login" />"#,
-                )))
+                Err(ServerResponse::new()
+                    .body(r#"<meta http-equiv="refresh" content="0; url=/login" />"#))
             } else {
-                Err(Box::new(
-                    ServerResponse::new().redirect(RedirectType::SeeOther, "/login"),
-                ))
+                Err(ServerResponse::new().redirect(RedirectType::SeeOther, "/login"))
             };
 
             let Some(token) = self.cookies.get("token") else {
