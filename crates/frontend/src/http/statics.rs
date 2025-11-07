@@ -1,10 +1,10 @@
 use hyper::header;
 
-use super::{request::ServerRequest, response::ServerResponse};
+use super::{request::ServerRequest, response::{ServerResponse, ServerResult}};
 
 macro_rules! static_file {
     ($name:ident, $path:literal, $mime:literal) => {
-        pub async fn $name(_req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
+        pub async fn $name(_req: ServerRequest) -> ServerResult<ServerResponse> {
             let file = include_bytes!($path);
 
             Ok(ServerResponse::new()

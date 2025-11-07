@@ -1,11 +1,11 @@
 use maud::html;
 use proto::backend::ServiceStatus;
 
-use crate::http::{request::ServerRequest, response::ServerResponse};
+use crate::http::{request::ServerRequest, response::{ServerResponse, ServerResult}};
 
 use super::template::{send_req, template};
 
-pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
+pub async fn page(req: ServerRequest) -> ServerResult<ServerResponse> {
     req.check_login()?;
 
     let data = send_req!(req, Services)?;

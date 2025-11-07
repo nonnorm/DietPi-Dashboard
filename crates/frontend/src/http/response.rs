@@ -11,7 +11,9 @@ pub struct ServerResponse {
     body: Bytes,
 }
 pub type BuiltResponse = hyper::Response<Full<Bytes>>;
+pub type ServerResult<T> = Result<T, Box<ServerResponse>>;
 
+#[derive(Copy, Clone)]
 pub enum RedirectType {
     Permanent,
     SeeOther,

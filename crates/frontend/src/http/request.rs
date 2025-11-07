@@ -27,7 +27,7 @@ use crate::backend::BackendHandle;
 use super::{
     FrontendContext,
     auth::SharedLoginMap,
-    response::{RedirectType, ServerResponse},
+    response::{RedirectType, ServerResponse, ServerResult},
 };
 
 pub type HyperRequest = hyper::Request<Incoming>;
@@ -86,7 +86,7 @@ impl ServerRequest {
         &self.context.config
     }
 
-    pub fn extract_backends(&self) -> Result<BackendData, ServerResponse> {
+    pub fn extract_backends(&self) -> ServerResult<BackendData> {
         let backends = self.context.backends.lock().unwrap();
         let backend_list: Vec<_> = backends
             .iter()
@@ -94,9 +94,9 @@ impl ServerRequest {
             .collect();
 
         if backend_list.is_empty() {
-            return Err(ServerResponse::new()
+            return Err(Box::new(ServerResponse::new()
                 .status(StatusCode::SERVICE_UNAVAILABLE)
-                .body("no connected backends"));
+                .body("no connected backends")));
         }
 
         let current_backend = {
@@ -126,58 +126,58 @@ impl ServerRequest {
     pub async fn send_backend_req(
         &self,
         req: RequestFrontendMessage,
-    ) -> Result<ResponseBackendMessage, ServerResponse> {
+    ) -> ServerResult<ResponseBackendMessage> {
         let backend_handle = self.extract_backends()?.current_backend.handle;
 
         backend_handle.send_req(req).await.map_err(|err| {
-            ServerResponse::new()
+            Box::new(ServerResponse::new()
                 .status(StatusCode::BAD_GATEWAY)
-                .body(format!("backend request failed: {err}"))
+                .body(format!("backend request failed: {err}")))
         })
     }
 
     pub async fn send_backend_action(
         &self,
         msg: ActionFrontendMessage,
-    ) -> Result<(), ServerResponse> {
+    ) -> ServerResult<()> {
         let backend_handle = self.extract_backends()?.current_backend.handle;
 
         backend_handle.send_action(msg).await.map_err(|err| {
-            ServerResponse::new()
+            Box::new(ServerResponse::new()
                 .status(StatusCode::BAD_GATEWAY)
-                .body(format!("backend action failed: {err}"))
+                .body(format!("backend action failed: {err}")))
         })
     }
 
-    pub fn extract_query<Qu: serde::de::DeserializeOwned>(&self) -> Result<Qu, ServerResponse> {
+    pub fn extract_query<Qu: serde::de::DeserializeOwned>(&self) -> ServerResult<Qu> {
         let query = self.uri.query().unwrap_or_default();
 
         serde_urlencoded::from_str(query).map_err(|err| {
-            ServerResponse::new()
+            Box::new(ServerResponse::new()
                 .status(StatusCode::BAD_REQUEST)
-                .body(format!("invalid query params: {err}"))
+                .body(format!("invalid query params: {err}")))
         })
     }
 
     pub async fn extract_form<T: serde::de::DeserializeOwned>(
         &mut self,
-    ) -> Result<T, ServerResponse> {
+    ) -> ServerResult<T> {
         let Some(body) = self.body.take() else {
-            return Err(ServerResponse::new()
+            return Err(Box::new(ServerResponse::new()
                 .status(StatusCode::INTERNAL_SERVER_ERROR)
-                .body("form already extracted"));
+                .body("form already extracted")));
         };
 
         let body = body.collect().await.map_err(|_| {
-            ServerResponse::new()
+            Box::new(ServerResponse::new()
                 .status(StatusCode::BAD_REQUEST)
-                .body("needs body")
+                .body("needs body"))
         })?;
 
         serde_urlencoded::from_bytes(&body.to_bytes()).map_err(|_| {
-            ServerResponse::new()
+            Box::new(ServerResponse::new()
                 .status(StatusCode::BAD_REQUEST)
-                .body("invalid form body")
+                .body("invalid form body"))
         })
     }
 
@@ -185,7 +185,7 @@ impl ServerRequest {
         self.headers.contains_key("nm-request")
     }
 
-    pub fn extract_websocket<F, Fut>(self, handler_fn: F) -> Result<ServerResponse, ServerResponse>
+    pub fn extract_websocket<F, Fut>(self, handler_fn: F) -> ServerResult<ServerResponse>
     where
         F: FnOnce(WebSocketStream<TokioIo<Upgraded>>) -> Fut + Send + 'static,
         Fut: Future + Send,
@@ -205,9 +205,9 @@ impl ServerRequest {
             && self.headers.contains_key(header::SEC_WEBSOCKET_KEY);
 
         if !is_websocket_req {
-            return Err(ServerResponse::new()
+            return Err(Box::new(ServerResponse::new()
                 .status(StatusCode::BAD_REQUEST)
-                .body("expected websocket upgrade"));
+                .body("expected websocket upgrade")));
         }
 
         let sec_key = self
@@ -241,13 +241,13 @@ impl ServerRequest {
         Ok(resp)
     }
 
-    pub fn check_login(&self) -> Result<(), ServerResponse> {
+    pub fn check_login(&self) -> ServerResult<()> {
         if self.config().enable_login {
             let err_resp = if self.is_fixi() {
-                Err(ServerResponse::new()
-                    .body(r#"<meta http-equiv="refresh" content="0; url=/login" />"#))
+                Err(Box::new(ServerResponse::new()
+                    .body(r#"<meta http-equiv="refresh" content="0; url=/login" />"#)))
             } else {
-                Err(ServerResponse::new().redirect(RedirectType::SeeOther, "/login"))
+                Err(Box::new(ServerResponse::new().redirect(RedirectType::SeeOther, "/login")))
             };
 
             let Some(token) = self.cookies.get("token") else {

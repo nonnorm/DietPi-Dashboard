@@ -6,6 +6,7 @@ use tokio::fs;
 
 use crate::client::BackendContext;
 
+#[allow(clippy::needless_pass_by_value)]  // Necessary for spawn_blocking which requires 'static
 pub fn process_signal(mut ctx: BackendContext, action: SignalAction) {
     let sys = &mut ctx.system();
 

@@ -3,7 +3,7 @@ use pretty_bytes_typed::pretty_bytes_binary;
 use proto::{backend::ProcessStatus, frontend::SignalAction};
 use serde::{Deserialize, Serialize};
 
-use crate::http::{request::ServerRequest, response::ServerResponse};
+use crate::http::{request::ServerRequest, response::{ServerResponse, ServerResult}};
 
 use super::template::{Icon, send_act, send_req, template};
 
@@ -53,7 +53,7 @@ fn table_header(name: &str, sort: ColumnSort, query: &ProcessQuery) -> Markup {
     }
 }
 
-pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
+pub async fn page(req: ServerRequest) -> ServerResult<ServerResponse> {
     req.check_login()?;
 
     let query: ProcessQuery = req.extract_query()?;
@@ -123,7 +123,7 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
     template(&req, content)
 }
 
-pub async fn signal(req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
+pub async fn signal(req: ServerRequest) -> ServerResult<ServerResponse> {
     req.check_login()?;
 
     let signal: SignalAction = req.extract_query()?;

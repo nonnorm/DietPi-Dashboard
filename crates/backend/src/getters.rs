@@ -1,5 +1,5 @@
 use std::os::unix::fs::MetadataExt;
-use std::{fs, path::PathBuf, process::Command};
+use std::{fs, process::Command};
 
 use mime_guess::mime;
 use proto::backend::FileKind;
@@ -72,8 +72,7 @@ pub fn memory(mut ctx: BackendContext) -> MemResponse {
 }
 
 pub fn disks(mut ctx: BackendContext) -> DiskResponse {
-    let mnt_points = &ctx.config.disks;
-    let mnt_points: Vec<_> = mnt_points.iter().map(PathBuf::from).collect();
+    let mnt_points = ctx.config.disks.clone();
 
     let disks = &mut ctx.system().disks;
     disks.refresh(false);
@@ -81,7 +80,10 @@ pub fn disks(mut ctx: BackendContext) -> DiskResponse {
 
     let disks: Vec<_> = disks
         .iter()
-        .filter(|disk| mnt_points.iter().any(|path| path == disk.mount_point()))
+        .filter(|disk| {
+            let mount_point_str = disk.mount_point().to_str().unwrap_or("");
+            mnt_points.iter().any(|path| path.as_str() == mount_point_str)
+        })
         .map(|disk| DiskInfo {
             name: disk.name().to_str().unwrap_or("unknown").into(),
             mnt_point: disk.mount_point().to_str().unwrap_or("unknown").into(),

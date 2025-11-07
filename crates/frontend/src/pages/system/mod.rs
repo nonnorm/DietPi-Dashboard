@@ -1,7 +1,7 @@
 use maud::html;
 use serde::{Deserialize, Serialize};
 
-use crate::http::{query_array::QueryArray, request::ServerRequest, response::ServerResponse};
+use crate::http::{query_array::QueryArray, request::ServerRequest, response::{ServerResponse, ServerResult}};
 
 use super::template::{send_req, template};
 
@@ -19,7 +19,7 @@ pub struct SystemQuery {
     recv_points: QueryArray,
 }
 
-pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> {
+pub async fn page(req: ServerRequest) -> ServerResult<ServerResponse> {
     req.check_login()?;
 
     let mut query: SystemQuery = req.extract_query()?;
