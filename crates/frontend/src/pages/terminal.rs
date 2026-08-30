@@ -14,7 +14,7 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
 
     let content = html! {
         section {
-            h2 { "Terminal" }
+            h2 data-i18n="terminal_title" { "Terminal" }
             web-terminal {}
         }
     };

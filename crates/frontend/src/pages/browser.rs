@@ -45,8 +45,8 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
 
             table #browser-inner {
                 tr {
-                    th { "File Name" }
-                    th { "File Size" }
+                    th data-i18n="file_name" { "File Name" }
+                    th data-i18n="file_size" { "File Size" }
                 }
                 @for item in data.dir_list {
                     @let name = item.path.rsplit_once('/').map(|(_, name)| name).unwrap_or(&item.path);
@@ -120,7 +120,12 @@ pub async fn file(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
                 pre {}
             }
             #actions-list {
-                button data-path=(query.path) title="Save" nm-bind="onclick: () => $post('/browser/file/save')" {
+                button
+                    data-path=(query.path)
+                    title="Save"
+                    data-i18n-title="save"
+                    nm-bind="onclick: () => $post('/browser/file/save')"
+                {
                     (Icon::new("fa6-solid-floppy-disk"))
                 }
             }
@@ -169,9 +174,9 @@ pub async fn actions(req: ServerRequest) -> Result<ServerResponse, ServerRespons
         div #actions-list data-path=(query.current_path) {
             (default_actions())
             @if matches!(query.kind, FileKind::TextFile | FileKind::BinaryFile | FileKind::Directory) {
-                button title="Rename" nm-bind={"
+                button title="Rename" data-i18n-title="rename" nm-bind={"
                     onclick: () => {
-                        let new_name = prompt('Enter a new name:');
+                        let new_name = prompt(window.__dashboardI18n?.t('enter_new_name', 'Enter a new name:'));
                         if (new_name) $post('/browser/actions/rename', {
                             path: '"(query.path)"',
                             new_name
@@ -182,22 +187,22 @@ pub async fn actions(req: ServerRequest) -> Result<ServerResponse, ServerRespons
                 }
             }
             @if matches!(query.kind, FileKind::TextFile | FileKind::BinaryFile)  {
-                button title="Delete" nm-bind={"
+                button title="Delete" data-i18n-title="delete" nm-bind={"
                     onclick: () => { 
-                        if (confirm('Are you sure you want to delete this file?'))
+                        if (confirm(window.__dashboardI18n?.t('confirm_delete_file', 'Are you sure you want to delete this file?')))
                             $post('/browser/actions/delete-file', {path: '"(query.path)"'});
                     }
                 "} { (Icon::new("fa6-solid-trash")) }
-                button title="Download" nm-bind={"
+                button title="Download" data-i18n-title="download" nm-bind={"
                     onclick: () => { 
                         window.open('/browser/actions/download?path="(query.path)"')
                     }
                 "} { (Icon::new("fa6-solid-file-arrow-down")) }
             }
             @if matches!(query.kind, FileKind::Directory)  {
-                button title="Delete" nm-bind={"
+                button title="Delete" data-i18n-title="delete" nm-bind={"
                     onclick: () => { 
-                        if (confirm('Are you sure you want to delete this folder?'))
+                        if (confirm(window.__dashboardI18n?.t('confirm_delete_folder', 'Are you sure you want to delete this folder?')))
                             $post('/browser/actions/delete-folder', {path: '"(query.path)"'});
                     }
                 "} { (Icon::new("fa6-solid-trash")) }
@@ -210,30 +215,30 @@ pub async fn actions(req: ServerRequest) -> Result<ServerResponse, ServerRespons
 
 fn default_actions() -> Markup {
     html! {
-        button title="Refresh" nm-bind="onclick: () => $get('/browser')" {
+        button title="Refresh" data-i18n-title="refresh" nm-bind="onclick: () => $get('/browser')" {
             (Icon::new("fa6-solid-rotate"))
         }
-        button title="Hide Hidden Files" nm-bind="
+        button title="Hide Hidden Files" data-i18n-title="hide_hidden_files" nm-bind="
             onclick: () => _viewHidden = true,
             hidden: () => _viewHidden,
         " { (Icon::new("fa6-solid-eye")) }
-        button title="Show Hidden Files" nm-bind="
+        button title="Show Hidden Files" data-i18n-title="show_hidden_files" nm-bind="
             onclick: () => _viewHidden = false,
             hidden: () => !_viewHidden,
         " { (Icon::new("fa6-solid-eye-slash")) }
-        button title="New File" nm-bind={"
+        button title="New File" data-i18n-title="new_file" nm-bind={"
             onclick: () => { 
-                let name = prompt('Enter a file name:');
+                let name = prompt(window.__dashboardI18n?.t('enter_file_name', 'Enter a file name:'));
                 if (name) $post('/browser/actions/new-file', {name});
             }
         "} { (Icon::new("fa6-solid-file-medical")) }
-        button title="New Folder" nm-bind={"
+        button title="New Folder" data-i18n-title="new_folder" nm-bind={"
             onclick: () => { 
-                let name = prompt('Enter a folder name:');
+                let name = prompt(window.__dashboardI18n?.t('enter_folder_name', 'Enter a folder name:'));
                 if (name) $post('/browser/actions/new-folder', {name});
             }
         "} { (Icon::new("fa6-solid-folder-plus")) }
-        button title="Upload" onclick="this.firstChild.click()" {
+        button title="Upload" data-i18n-title="upload" onclick="this.firstChild.click()" {
             input type="file" hidden nm-bind="
                 onchange: () => {
                     let file = this.files[0];

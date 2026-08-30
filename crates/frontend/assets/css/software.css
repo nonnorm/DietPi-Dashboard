@@ -1,55 +1,127 @@
+#software-card {
+    overflow-x: auto;
+}
+
+#software-card table {
+    min-width: 56rem;
+}
+
 .tab-container {
-    >.tabs {
-        border-bottom: var(--border-size-1) solid var(--gray-6);
-    }
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-3);
+}
 
-    >.tabs>button {
-        background-color: light-dark(var(--gray-2), var(--gray-10));
-        border: var(--border-size-1) solid var(--gray-6);
-        border-bottom: none;
+.tab-container > .tabs {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--size-1);
+    width: fit-content;
+    max-width: 100%;
+    padding: 0.2rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--surface-muted) 85%, transparent);
+}
 
-        padding: var(--size-1);
+.tab-container > .tabs > button {
+    border: 1px solid transparent;
+    border-radius: var(--radius-full);
+    padding: 0.45rem 0.85rem;
+    color: var(--text-secondary);
+    font-size: var(--font-size-0);
+    font-weight: var(--font-weight-semibold);
+    white-space: nowrap;
+}
 
-        cursor: pointer;
+.tab-container > .tabs > button[aria-selected="true"] {
+    background: var(--surface-panel);
+    color: var(--text-primary);
+    border-color: var(--border-subtle);
+    box-shadow: var(--shadow-xs);
+}
 
-        &[aria-selected="true"] {
-            background-color: var(--gray-6);
-        }
-    }
+.tab-container > .tabs > button:hover {
+    color: var(--text-primary);
 }
 
 .software-input {
-    padding: var(--size-2);
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: var(--size-2);
+    margin-top: var(--size-2);
+    padding: 0.74rem 0.9rem;
 
+    border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
-    border: none;
+    background: color-mix(in srgb, var(--surface-muted) 86%, transparent);
 
-    cursor: pointer;
+    font-size: var(--font-size-1);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    text-align: left;
+}
 
-    &[data-action="install"] {
-        background-color: var(--green-6);
-    }
+.software-input:hover {
+    border-color: var(--border-strong);
+    background: var(--surface-panel);
+}
 
-    &[data-action="uninstall"] {
-        background-color: var(--red-6);
-    }
+.software-input[data-action="install"]:hover {
+    background: var(--surface-strong);
+    color: var(--text-inverse);
+}
 
-    &:disabled {
-        opacity: 70%;
-    }
+.software-input[data-action="uninstall"] {
+    border-color: color-mix(in srgb, var(--red-6) 25%, var(--border-subtle));
+    color: var(--red-6);
+}
 
-    >.spinner {
-        display: none;
-        animation: spin 1s linear infinite;
-    }
+.software-input[data-action="uninstall"]:hover {
+    background: color-mix(in srgb, var(--red-6) 12%, transparent);
+}
 
-    &:disabled>.spinner {
-        display: inline-block;
-    }
+.software-input > .spinner {
+    display: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid color-mix(in srgb, var(--border-subtle) 80%, transparent);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    flex-shrink: 0;
+    animation: spin 0.8s linear infinite;
+}
+
+.software-input:disabled > .spinner {
+    display: inline-block;
+}
+
+.software-input > span:last-child {
+    color: var(--text-secondary);
+    font-size: var(--font-size-0);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 @keyframes spin {
     to {
-        transform: rotate(1turn)
+        transform: rotate(1turn);
+    }
+}
+
+@media (max-width: 760px) {
+    .tab-container > .tabs {
+        width: 100%;
+    }
+
+    .tab-container > .tabs > button {
+        flex: 1;
+        text-align: center;
+    }
+
+    #software-card table {
+        min-width: 50rem;
     }
 }

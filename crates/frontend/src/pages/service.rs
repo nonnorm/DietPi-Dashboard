@@ -12,29 +12,30 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
 
     let content = html! {
         section {
-            h2 { "Services" }
+            h2 data-i18n="services_title" { "Services" }
             table {
                 tr {
-                    th { "Name" }
-                    th { "Status" }
-                    th { "Error Log" }
-                    th { "Start Time" }
+                    th data-i18n="name" { "Name" }
+                    th data-i18n="status" { "Status" }
+                    th data-i18n="error_log" { "Error Log" }
+                    th data-i18n="start_time" { "Start Time" }
                 }
                 @for service in data.services {
+                    @let (status_attr, status_label, status_i18n) = match service.status {
+                        ServiceStatus::Active => ("active", "Active", "active"),
+                        ServiceStatus::Inactive => ("inactive", "Inactive", "inactive"),
+                        ServiceStatus::Failed => ("failed", "Failed", "failed"),
+                        ServiceStatus::Unknown => ("unknown", "Unknown", "unknown"),
+                    };
                     tr {
                         td { (service.name) }
                         td {
-                            @match service.status {
-                                ServiceStatus::Active => "active",
-                                ServiceStatus::Inactive => "inactive",
-                                ServiceStatus::Failed => "failed",
-                                ServiceStatus::Unknown => "unknown"
-                            }
+                            span .status-badge data-status=(status_attr) data-i18n=(status_i18n) { (status_label) }
                         }
                         td {
                             @if !service.err_log.is_empty() {
                                 details {
-                                    summary { "View log" }
+                                    summary data-i18n="view_log" { "View log" }
                                     pre {
                                         (service.err_log)
                                     }
