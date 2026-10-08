@@ -35,46 +35,46 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
 
     let content = html! {
         section {
-            h2 { "Host Information" }
+            h2 data-i18n="host_information" { "Host Information" }
 
             table .management-table {
                 tr {
-                    td { "Hostname" }
+                    td data-i18n="hostname" { "Hostname" }
                     td { (data.hostname) }
                 }
                 tr {
-                    td { "Network Interface" }
+                    td data-i18n="network_interface" { "Network Interface" }
                     td { (data.nic) }
                 }
                 tr {
-                    td { "Uptime" }
+                    td data-i18n="uptime" { "Uptime" }
                     td { (pretty_time) }
                 }
                 tr {
-                    td { "Installed Packages" }
+                    td data-i18n="installed_packages" { "Installed Packages" }
                     td { (data.num_pkgs) }
                 }
                 tr {
-                    td { "OS Version" }
+                    td data-i18n="os_version" { "OS Version" }
                     td { (data.os_version) }
                 }
                 tr {
-                    td { "Kernel Version" }
+                    td data-i18n="kernel_version" { "Kernel Version" }
                     td { (data.kernel) }
                 }
                 tr {
-                    td { "DietPi Version" }
+                    td data-i18n="dietpi_version" { "DietPi Version" }
                     td { (data.dp_version) }
                 }
                 tr {
-                    td { "Architecture" }
+                    td data-i18n="architecture" { "Architecture" }
                     td { (data.arch) }
                 }
             }
         }
         br;
         section {
-            h2 { "Frontend Config" }
+            h2 data-i18n="frontend_config" { "Frontend Config" }
 
             pre {
                 (frontend_cfg)
@@ -82,7 +82,7 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
         }
         br;
         section {
-            h2 { "Backend Config" }
+            h2 data-i18n="backend_config" { "Backend Config" }
 
             pre {
                 (backend_cfg)
@@ -91,10 +91,10 @@ pub async fn page(req: ServerRequest) -> Result<ServerResponse, ServerResponse> 
         @if req.config().enable_login {
             br;
             section {
-                h2 { "Dashboard Administration" }
+                h2 data-i18n="dashboard_administration" { "Dashboard Administration" }
 
                 form action="/logout" method="POST" {
-                    button .logout { "Logout" }
+                    button .logout data-i18n="logout" { "Logout" }
                 }
             }
         }
