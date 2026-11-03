@@ -120,7 +120,7 @@ pub struct SoftwareResponse {
 
 #[derive(Debug, Clone, Encode, Decode)]
 pub struct SoftwareInfo {
-    pub id: u16,
+    pub id: String,
     pub name: String,
     pub desc: String,
     pub deps: String,
