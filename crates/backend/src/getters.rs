@@ -203,7 +203,14 @@ fn parse_software_line(line: &str) -> Option<(SoftwareInfo, bool)> {
     if id.contains("DISABLED") {
         return None;
     }
-    let id: u16 = id.parse().ok()?;
+    if id.is_empty()
+        || !id
+            .bytes()
+            .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit())
+    {
+        return None;
+    }
+    let id = id.into();
 
     let installed = fields.next()?;
     let installed: u8 = installed.parse().ok()?;

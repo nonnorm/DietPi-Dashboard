@@ -125,9 +125,14 @@ pub async fn form(mut req: ServerRequest) -> Result<ServerResponse, ServerRespon
     .into();
 
     let mut args = vec![action];
-    for id in form.software.iter::<u16>() {
-        args.push(id.to_string());
-    }
+    // Only pass through valid software IDs, so nothing can be interpreted as an option
+    let is_valid_id = |id: &String| {
+        !id.is_empty()
+            && id
+                .bytes()
+                .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit())
+    };
+    args.extend(form.software.iter::<String>().filter(is_valid_id));
 
     let msg = CommandAction {
         cmd: "/boot/dietpi/dietpi-software".into(),
