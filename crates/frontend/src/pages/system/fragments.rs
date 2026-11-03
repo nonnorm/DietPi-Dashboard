@@ -16,16 +16,19 @@ fn calc_percent(used: u64, total: u64) -> f32 {
     (percent * 100.).round() / 100.
 }
 
+// Tiles with more elements than fit into this many rows scroll instead, see system.css
+const MAX_GRID_SPAN: usize = 6;
+
 fn calc_grid_span(num_elts: usize) -> usize {
     // Starting at two rows, we need roughly 1 row for every 2 elements
-    num_elts.div_ceil(2) + 1
+    (num_elts.div_ceil(2) + 1).min(MAX_GRID_SPAN)
 }
 
 pub fn cpu_meters(cpu_data: &CpuResponse, temp_data: &TempResponse) -> Markup {
     let cpu_iter = cpu_data.cpus.iter().zip(1_u8..);
 
-    // Add 1 row to account for CPU temperature and global CPU
-    let span = calc_grid_span(cpu_data.cpus.len()) + 1;
+    // Add 2 elements to account for CPU temperature and global CPU
+    let span = calc_grid_span(cpu_data.cpus.len() + 2);
 
     html! {
         section .{"span-" (span)} {
