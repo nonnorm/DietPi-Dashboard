@@ -1,19 +1,27 @@
 .management-table {
-    td:first-child {
-        font-weight: var(--font-weight-medium);
-    }
+    min-width: 34rem;
+}
+
+.management-table td:first-child {
+    width: 15rem;
+    white-space: nowrap;
+    color: var(--text-secondary);
+    font-weight: var(--font-weight-semibold);
 }
 
 button.logout {
-    background-color: var(--red-8);
-    color: white;
-    font-size: var(--font-size-4);
-    padding: var(--size-2);
-    border-radius: var(--radius-lg);
-    border: none;
+    align-self: flex-start;
+    padding: 0.62rem 1.2rem;
+    border: 1px solid color-mix(in srgb, var(--red-6) 34%, var(--border-subtle));
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--red-6) 10%, transparent);
+    color: var(--red-6);
+    font-size: var(--font-size-1);
+    font-weight: var(--font-weight-semibold);
+}
 
-    &:active {
-        color: var(--gray-2);
-        background-color: var(--red-10);
-    }
+button.logout:hover {
+    background: var(--red-6);
+    color: var(--text-inverse);
+    border-color: var(--red-6);
 }
