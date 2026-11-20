@@ -21,8 +21,15 @@
     grid-row: span 5;
 }
 
+/* Maximum height: tiles with more content scroll */
 .span-6 {
     grid-row: span 6;
+    overflow-y: auto;
+
+    /* Prevent flex children (e.g. empty meter containers) from shrinking instead of overflowing */
+    >* {
+        flex-shrink: 0;
+    }
 }
 
 .meter-container {
