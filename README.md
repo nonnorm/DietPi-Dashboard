@@ -28,7 +28,8 @@ chmod +x dietpi-dashboard # Make binary executable
 #### Prereq:
 
 ```sh
-dietpi-software install 9 16 17 # Install Node.js (webpage), Build-Essential (gcc), and Git (git clone), respectively
+apt install gcc
+dietpi-software install nodejs git # Install Node.js (webpage) and Git (git clone)
 corepack enable # Enable pnpm package manager, for node dependencies
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh # Install Rust (backend)
 source ~/.cargo/env # Update $PATH
