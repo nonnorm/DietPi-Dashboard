@@ -25,15 +25,11 @@
 .span-6 {
     grid-row: span 6;
     overflow-y: auto;
-
-    /* Prevent flex children (e.g. empty meter containers) from shrinking instead of overflowing */
-    >* {
-        flex-shrink: 0;
-    }
 }
 
 .meter-container {
-    height: var(--size-4);
+    min-height: calc(var(--size-4) * .9);
+    max-height: var(--size-4);
 
     border: solid var(--border-size-1) light-dark(black, var(--gray-6));
     border-radius: var(--radius-xs);
