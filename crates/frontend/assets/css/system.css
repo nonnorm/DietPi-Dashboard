@@ -21,12 +21,15 @@
     grid-row: span 5;
 }
 
+/* Maximum height: tiles with more content scroll */
 .span-6 {
     grid-row: span 6;
+    overflow-y: auto;
 }
 
 .meter-container {
-    height: var(--size-4);
+    min-height: calc(var(--size-4) * .9);
+    max-height: var(--size-4);
 
     border: solid var(--border-size-1) light-dark(black, var(--gray-6));
     border-radius: var(--radius-xs);
